@@ -44,6 +44,17 @@ if (Get-Command composer -ErrorAction SilentlyContinue) {
     info "Composer installed: $(composer --version)"
 }
 
+# =============== INSTALL NODEJS AND NPM ===============  
+if (Get-Command node -ErrorAction SilentlyContinue) {
+    warning "Node.js already installed: $(node -v)"
+} else {
+    info "Installing Node.js..."
+    winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements
+    Refresh-Path
+    info "Node.js installed: $(node -v), npm: $(npm -v)"
+}
+
+
 # =============== INSTALL MYSQL =============== 
 if (Get-Command mysql -ErrorAction SilentlyContinue) {
     warning "MySQL already installed."
@@ -111,6 +122,12 @@ FLUSH PRIVILEGES;
         Set-Content .env
     
     info "Updated .env with dedicated user credentials."
+}
+
+# =============== INSTALL JS DEPENDENCIES =============== 
+if (Test-Path "package.json") {
+    info "Installing JS dependencies..."
+    npm install
 }
 
 # =============== GENERATE APPLICATION KEY =============== 

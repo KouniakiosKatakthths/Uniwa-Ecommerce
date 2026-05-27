@@ -29,6 +29,16 @@ sudo apt install -y php php-cli php-mbstring php-xml php-curl \
  
 info "PHP version: $(php -v | head -n 1)"
 
+# ========= INSTALL MYSQL ============
+if ! command -v mysql &>/dev/null; then
+    info "Installing MySQL..."
+    sudo apt install -y mysql-server
+    sudo systemctl start mysql
+    sudo systemctl enable mysql
+else
+    warning "MySQL already installed: $(mysql --version)"
+fi
+
 # ========= INSTALL COMPOSER ============
 if command -v composer &>/dev/null; then
     warning "Composer already installed: $(composer --version)"
@@ -50,6 +60,26 @@ else
     sudo chmod +x /usr/local/bin/composer
  
     info "Composer version: $(composer --version)"
+fi
+
+# ========= INSTALL NODEJS AND NPM ============
+if command -v node &>/dev/null; then
+    warning "Node.js already installed: $(node -v)"
+else
+    if command -v nvm &>/dev/null; then
+        warning "Nvm already installed $(nvm -v)"
+    else
+        info "Installing nvm..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+
+        # Reload shell environment for current script
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    fi
+
+    info "Installing Node.js & npm using nvm..."
+    nvm install node
+    info "Node.js installed: $(node -v), npm: $(npm -v)"
 fi
  
 # ========= INSTALL PROJECT DEPENDENCIES ============ 
@@ -104,6 +134,12 @@ EOF
     sed -i "s/DB_USERNAME=.*/DB_USERNAME=${DB_USER}/" .env
     sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/" .env
     info "Updated .env with dedicated user credentials."
+fi
+
+# ========= INSTALL JS DEPENCENCIES ============ 
+if [ -f "package.json" ]; then
+    info "Installing JS dependencies..."
+    npm install
 fi
 
 
