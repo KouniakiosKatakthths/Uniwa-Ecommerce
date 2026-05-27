@@ -64,45 +64,47 @@ fi
 if [ -f ".env.example" ] && [ ! -f ".env" ]; then
     info "Copying .env.example to .env..."
     cp .env.example .env
-    php artisan key:generate
 elif [ -f ".env" ]; then
     warning ".env already exists, skipping."
 fi
 
 # ============ Create MySQL database ============
-read -p "$(echo -e ${YELLOW}Enter MySQL root password [leave empty if none]:${NC} )" MYSQL_ROOT_PASS
-read -p "$(echo -e ${YELLOW}Enter database name [default: uniwa_ecommerce]:${NC} )" DB_NAME
-read -p "$(echo -e ${YELLOW}Enter new DB username [default: uniwa_user]:${NC} )" DB_USER
-read -p "$(echo -e ${YELLOW}Enter new DB user password:${NC} )" DB_PASS
+read -p "$(echo -e ${YELLOW}Run database setup? [y/N]:${NC} )" RUN_DB_SETUP
+if [[ "$RUN_DB_SETUP" =~ ^[Yy]$ ]]; then
+    read -p "$(echo -e ${YELLOW}Enter MySQL root password [leave empty if none]:${NC} )" MYSQL_ROOT_PASS
+    read -p "$(echo -e ${YELLOW}Enter database name [default: uniwa_ecommerce]:${NC} )" DB_NAME
+    read -p "$(echo -e ${YELLOW}Enter new DB username [default: uniwa_user]:${NC} )" DB_USER
+    read -p "$(echo -e ${YELLOW}Enter new DB user password:${NC} )" DB_PASS
+    
+    DB_NAME=${DB_NAME:-uniwa_ecommerce}
+    DB_USER=${DB_USER:-uniwa_user}
+    
+    if [ -z "$DB_PASS" ]; then
+        error "DB user password cannot be empty."
+    fi
+    
+    if [ -z "$MYSQL_ROOT_PASS" ]; then
+        MYSQL_CMD="sudo mysql"
+    else
+        MYSQL_CMD="mysql -u root -p${MYSQL_ROOT_PASS}"
+    fi
  
-DB_NAME=${DB_NAME:-uniwa_ecommerce}
-DB_USER=${DB_USER:-uniwa_user}
- 
-if [ -z "$DB_PASS" ]; then
-    error "DB user password cannot be empty."
-fi
- 
-if [ -z "$MYSQL_ROOT_PASS" ]; then
-    MYSQL_CMD="sudo mysql"
-else
-    MYSQL_CMD="mysql -u root -p${MYSQL_ROOT_PASS}"
-fi
- 
-info "Creating database '$DB_NAME'..."
-$MYSQL_CMD <<EOF
+    info "Creating database '$DB_NAME'..."
+    $MYSQL_CMD <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
  
-info "Database '$DB_NAME' and user '$DB_USER' created with restricted access."
+    info "Database '$DB_NAME' and user '$DB_USER' created with restricted access."
  
-# Update .env with new user credentials (not root!)
-sed -i "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" .env
-sed -i "s/DB_USERNAME=.*/DB_USERNAME=${DB_USER}/" .env
-sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/" .env
-info "Updated .env with dedicated user credentials."
+    # Update .env with new user credentials (not root!)
+    sed -i "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" .env
+    sed -i "s/DB_USERNAME=.*/DB_USERNAME=${DB_USER}/" .env
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/" .env
+    info "Updated .env with dedicated user credentials."
+fi
 
 
 # ========= GENERATE APP KEY ============ 
