@@ -3,10 +3,11 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "start": "concurrently \"php artisan serve\" \"vite\""
     },
     "devDependencies": {
         "axios": "^1.6.4",
+        "concurrently": "^9.2.1",
         "laravel-vite-plugin": "^1.0.0",
         "vite": "^6.3.5"
     },

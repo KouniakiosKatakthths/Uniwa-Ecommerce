@@ -98,7 +98,7 @@ elif [ -f ".env" ]; then
     warning ".env already exists, skipping."
 fi
 
-# ============ Create MySQL database ============
+# ============ CREATE MYSQL DATABASE ============
 read -p "$(echo -e ${YELLOW}Run database setup? [y/N]:${NC} )" RUN_DB_SETUP
 if [[ "$RUN_DB_SETUP" =~ ^[Yy]$ ]]; then
     read -p "$(echo -e ${YELLOW}Enter MySQL root password [leave empty if none]:${NC} )" MYSQL_ROOT_PASS
