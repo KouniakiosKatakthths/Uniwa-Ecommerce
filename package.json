@@ -2,8 +2,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "start": "concurrently \"php artisan serve\" \"vite\""
+        "dev": "concurrently \"php artisan serve\" \"vite\""
     },
     "devDependencies": {
         "axios": "^1.6.4",
