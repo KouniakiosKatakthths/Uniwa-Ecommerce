@@ -9,12 +9,21 @@
     <div class="relative z-10 p-10">
       <div class="flex gap-5">
         {{-- Movie image --}}
-        <img class="w-3xl h-85" src="{{ $featured->poster_url }}">
+        <img class="w-70 h-85 shadow-[0_10px_40px_rgba(200,169,110,0.3)] rounded-lg" src="{{ $featured->poster_url }}">
 
         {{-- Movie detailes --}}
         <div class="flex flex-col gap-5">
-          <h1 class="text-gray-200 text-6xl">{{ $featured->title }}</h1>
-          <p class="w-4/5 text-gray-500">{{ $featured->description }}{{ $featured->description }}{{ $featured->description }}</p>
+          <h1 class="text-gray-200 text-6xl first-letter:uppercase">{{ $featured->title }}</h1>
+          <div class="flex flex-col gap-2">
+            <p class="w-4/5 text-gray-400 first-letter:uppercase">{{ $featured->description }}</p>
+            <div class="flex items-center">
+              <p class="text-sm font-normal text-gray-600">
+                {{ $featured->rating }} &#8226; 
+                {{ $featured->getDurationFormatted() }} &#8226; 
+                <span class="bottom-2 right-2 text-sm text-[#c8a96e] font-medium">★ 4.8</span>
+              </p>
+            </div>
+          </div>
 
           {{-- Control buttons --}}
           <div class="mt-auto flex gap-4">
@@ -33,11 +42,21 @@
 
   {{-- Playing now --}}
   <section class="p-10">
-    <h1 class="text-gray-300 text-center text-3xl font-bold">Playing now</h1>
+    <div class="flex justify-between">
+      <h1 class="text-gray-300 text-3xl font-bold">Playing now</h1>
+      <x-button variant="ghost" class="flex items-center gap-2">
+        <span>Show all</span>
+        <svg width="15" height="15" viewBox="0 2 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 19L19 12L8 5V19Z" fill="currentColor"></path>
+        </svg>
+      </x-button>
+    </div>
 
-    @foreach ($nowPlaying as $movie)
-      <x-movie-card :movie="$movie"></x-movie-card>
-    @endforeach
+    <div class="flex justify-between mt-4">
+      @foreach ($nowPlaying as $movie)
+        <x-movie-card :movie="$movie"></x-movie-card>
+      @endforeach
+    </div>
   </section>
 </div>   
 @endsection

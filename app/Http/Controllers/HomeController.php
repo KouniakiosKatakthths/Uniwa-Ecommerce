@@ -9,8 +9,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $featured = Movie::where('featured', true)->first();
-        $nowPlaying = Movie::where('status', 'now_playing')->take(5)->get();
+        $featured = Movie::where('featured', true)->inRandomOrder()->first();
+        $nowPlaying = Movie::where('status', 'now_playing')->inRandomOrder()->take(4)->get();
 
         return view("home", compact('featured', 'nowPlaying'));
     }
