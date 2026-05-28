@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --color-accent: #c8a96e;
+
   --gradient-hero: linear-gradient(135deg, #291a33 0%, #142847 50%, #11241b 100%);
   --gradient-hero-overlay: linear-gradient(to bottom, transparent 0%, rgba(2, 6, 24, 0.85) 100%, transparent 100%);
 
@@ -11,3 +13,5 @@
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

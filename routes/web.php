@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class,'index'])->name('home');
+Route::get('/newplaying', [MovieController::class, "now_playing"])->name("movies.now");
+Route::get("/upcoming", [MovieController::class, "upcoming"])->name("movies.upcoming");
+
 
 Route::get("/movie/{movie_id}", [MovieController::class, "show"])->name("movies.show");
 

@@ -1,7 +1,7 @@
 @extends('layouts.cinema')
 
 @section("content")
-<x-card>
+<x-card class="sm:max-w-md mx-auto">
   <!-- Session Status -->
   <x-auth-session-status class="mb-4" :status="session('status')" />
 

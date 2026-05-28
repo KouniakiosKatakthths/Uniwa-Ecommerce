@@ -1,7 +1,7 @@
 @extends("layouts.cinema")
 
 @section("content")
-<x-card>
+<x-card class="sm:max-w-md mx-auto">
   <h1 class="text-gray-800 dark:text-gray-200 text-2xl mb-5">Register</h1>
   <form method="POST" action="{{ route('register') }}">
     @csrf

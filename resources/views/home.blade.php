@@ -6,7 +6,7 @@
   <section class="relative">
     <div class="absolute inset-0 bg-(image:--gradient-hero)"></div>
     <div class="absolute inset-0 bg-(image:--gradient-hero-overlay)"></div>
-    <div class="relative z-10 p-10 flex gap-5">
+    <div class="relative z-10 py-10 flex gap-5 max-w-7xl mx-auto sm:px-6 lg:px-8">
       {{-- Movie image --}}
       <img class="w-70 h-85 shadow-[0_10px_40px_rgba(200,169,110,0.3)] rounded-lg" src="{{ $featured->poster_url }}">
 
@@ -19,7 +19,7 @@
             <p class="text-sm font-normal text-gray-600">
               {{ $featured->rating }} &#8226; 
               {{ $featured->getDurationFormatted() }} &#8226; 
-              <span class="bottom-2 right-2 text-sm text-[#c8a96e] font-medium">★ 4.8</span>
+              <span class="bottom-2 right-2 text-sm text-accen font-medium">★ 4.8</span>
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@
   </section>
 
   {{-- Playing now --}}
-  <section class="p-10">
+  <section class="max-w-7xl w-full mx-auto py-10 sm:px-6 lg:px-8">
     <div class="flex justify-between">
       <h1 class="text-gray-300 text-3xl font-bold">Playing now</h1>
       <x-button variant="ghost" class="flex items-center gap-2">

@@ -29,6 +29,16 @@ class MovieController extends Controller
         return view('movie', compact('movie'));
     }
 
+    public function now_playing()
+    {
+        return view('now-playing');
+    }
+
+    public function upcoming()
+    {
+        return view('upcoming');
+    }
+
     public function edit()    {} // GET  /movies/{movie}/edit → edit form
     public function update()  {} // PUT  /movies/{movie}  → save changes
     public function destroy() {} // DELETE /movies/{movie} → delete
