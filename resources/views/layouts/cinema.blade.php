@@ -14,7 +14,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>
 
-  <body class="bg-slate-950 min-h-screen flex flex-col">
+  <body class="dark:bg-slate-950 bg-gray-100 min-h-screen flex flex-col">
     @include('partials.navbar')
 
     <main class="flex-1">@yield('content')</main>

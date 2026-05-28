@@ -3,6 +3,8 @@
 @theme {
   --gradient-hero: linear-gradient(135deg, #291a33 0%, #142847 50%, #11241b 100%);
   --gradient-hero-overlay: linear-gradient(to bottom, transparent 0%, rgba(2, 6, 24, 0.85) 100%, transparent 100%);
+
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 }
 
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
