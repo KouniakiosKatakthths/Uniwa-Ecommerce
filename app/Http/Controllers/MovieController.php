@@ -23,7 +23,12 @@ class MovieController extends Controller
 
     }
 
-    public function show()    {} // GET  /movies/{movie}  → single movie
+    public function show(string $movie_id)
+    {
+        $movie = Movie::find($movie_id);
+        return view('movie', compact('movie'));
+    }
+
     public function edit()    {} // GET  /movies/{movie}/edit → edit form
     public function update()  {} // PUT  /movies/{movie}  → save changes
     public function destroy() {} // DELETE /movies/{movie} → delete

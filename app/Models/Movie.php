@@ -9,6 +9,9 @@ class Movie extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'title',
         'description',
@@ -31,5 +34,13 @@ class Movie extends Model
     public function getDurationFormatted(): string
     {
         return floor($this->duration / 60) . 'h ' . ($this->duration % 60) . 'm';
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->id = (string) \Illuminate\Support\Str::uuid();
+        });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\Movie;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
@@ -11,10 +12,9 @@ class MovieCard extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public Movie $movie,
+    ) {}
 
     /**
      * Get the view / contents that represent the component.
