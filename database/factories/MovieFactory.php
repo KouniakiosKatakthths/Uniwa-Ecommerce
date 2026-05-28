@@ -24,7 +24,7 @@ class MovieFactory extends Factory
             'duration' => fake()->numberBetween(90, 180),
             'rating' => fake()->randomElement(['PG', 'PG-13', 'R']),
             'status' => fake()->randomElement(['now_playing', 'coming_soon']),
-            'featured' => false,
+            'featured' => fake()->boolean(),
             'release_date' => fake()->dateTime($max = 'now', $timezone = null),
         ];
     }

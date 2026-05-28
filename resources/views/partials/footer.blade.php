@@ -2,7 +2,7 @@
   <!-- Logo -->
   <div class="font-[Roboto] tracking-wider text-3xl text-white">CINE<span class="text-[#c8a96e]">LUX</span></div>
 
-  <div class="flex text-white gap-2">
+  <div class="flex text-gray-400 gap-4">
     <a href="#">About</a>
     <a href="#">Contact</a>
     <a href="#">Privacy</a>
