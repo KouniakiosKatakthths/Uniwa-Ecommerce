@@ -47,7 +47,7 @@ class ShowtimeFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'starts_at' => $this->faker->dateTimeThisYear('+1 days'),
+                'starts_at' => $this->faker->dateTimeBetween('now', '+6 months'),
             ];
         });
     }

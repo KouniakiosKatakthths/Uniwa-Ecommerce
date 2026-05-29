@@ -38,7 +38,7 @@
         
         {{-- Buttons --}}
         <div class="flex gap-4">
-          <x-button variant="ghost">Watch trailer</x-button>
+          <x-button x-data="" variant="ghost" x-on:click.prevent="$dispatch('open-modal', 'movie-trailer-container')">Watch trailer</x-button>
           <x-button>Get tickets</x-button>
         </div>
       </div>
@@ -47,9 +47,12 @@
 
   {{-- Showtimes --}}
   <section>
-    <x-modal name="asd" show="true">
-      <p>asdasd</p>
-    </x-modal>
   </section>
 </div>
+
+<x-modal name="movie-trailer-container" x-data="" focusable>
+  <div class="p-10 text-gray-200">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/06gXGAHnRyE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+  </div>
+</x-modal>
 @endsection

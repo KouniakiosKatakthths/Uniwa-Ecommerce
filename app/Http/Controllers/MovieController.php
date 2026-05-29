@@ -31,10 +31,10 @@ class MovieController extends Controller
     public function now_playing()
     {
         $now_playing = Movie::whereHas('showtimes', function ($query) {
-            $query->where('starts_at','<=', now()->addDays(7));
-        })->get();
-
-        
+            $query->where('starts_at', '>=', now())
+                ->where('starts_at', '<=', now()->addDays(7));
+        })->orderByDesc('featured')
+        ->get();
 
         return view('now-playing', compact('now_playing'));
     }
