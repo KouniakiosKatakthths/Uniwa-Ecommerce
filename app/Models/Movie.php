@@ -19,13 +19,15 @@ class Movie extends Model
         'trailer_url',
         'duration',
         'rating',
-        'score',
-        'status',
+        'actors',
+        'director',
+        'genre',
         'featured',
         'release_date',
     ];
 
     protected $casts = [
+        'actors' => 'array',
         'release_date' => 'date',
         'featured' => 'boolean',
     ];
@@ -42,5 +44,16 @@ class Movie extends Model
         static::creating(function ($model) {
             $model->id = (string) \Illuminate\Support\Str::uuid();
         });
+    }
+
+    public function showtimes()
+    {
+        return $this->hasMany(Showtime::class, 'movie_id', 'id');
+    }
+
+    // User model
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

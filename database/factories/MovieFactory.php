@@ -23,9 +23,20 @@ class MovieFactory extends Factory
             'trailer_url' => "https://www.youtube.com/watch?v=06gXGAHnRyE",
             'duration' => fake()->numberBetween(90, 180),
             'rating' => fake()->randomElement(['PG', 'PG-13', 'R']),
-            'status' => fake()->randomElement(['now_playing', 'coming_soon']),
+            'actors' => [ fake()->words(2, true), fake()->words(2, true), fake()->words(2, true) ],
+            'director' => fake()->words(2, true),
+            'genre' => fake()->word(),
             'featured' => fake()->boolean(),
             'release_date' => fake()->dateTime($max = 'now', $timezone = null),
         ];
+    }
+
+    public function featured(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'featured' => true,
+            ];
+        });
     }
 }

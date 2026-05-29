@@ -13,5 +13,3 @@
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";
-
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

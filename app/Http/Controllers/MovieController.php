@@ -9,8 +9,8 @@ class MovieController extends Controller
 {
     public function index()   
     {
-        $now_playing = Movie::where("status", "now_playing")->get();
-        $comingSoon = Movie::where('status', 'coming_soon')->get();
+        $now_playing = Movie::inRandomOrder()->take(5)->get();
+        
     }
 
     public function create()  
@@ -31,7 +31,8 @@ class MovieController extends Controller
 
     public function now_playing()
     {
-        return view('now-playing');
+        $now_playing = Movie::inRandomOrder()->take(5)->get();
+        return view('now-playing', compact('now_playing'));
     }
 
     public function upcoming()

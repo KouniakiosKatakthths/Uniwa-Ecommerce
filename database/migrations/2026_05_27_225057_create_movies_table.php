@@ -19,7 +19,9 @@ return new class extends Migration
             $table->text('trailer_url');
             $table->string('rating');
             $table->integer('duration');
-            $table->enum('status', ['now_playing', 'coming_soon', 'archived'])->default('now_playing');
+            $table->json('actors')->nullable();
+            $table->text('director');
+            $table->text('genre');
             $table->boolean('featured')->default(false);
             $table->date('release_date');
             $table->timestamps();

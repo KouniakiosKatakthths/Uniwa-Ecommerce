@@ -1,7 +1,7 @@
 @extends("layouts.cinema")
 
 @section("content")
-<x-card>
+<x-card class="sm:max-w-md mx-auto">
   <h1 class="text-gray-800 dark:text-gray-200 text-2xl mb-5">Password reset</h1>
   <div class="mb-4 text-sm text-gray-600 dark:text-gray-200">
     {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}

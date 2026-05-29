@@ -19,7 +19,7 @@
           <x-nav-link :href="route('movies.upcoming')" :active="request()->routeIs('movies.upcoming')">
             {{ __('Upcoming') }}
           </x-nav-link>
-          <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+          <x-nav-link :href="route('info')" :active="request()->routeIs('info')">
             {{ __('Information') }}
           </x-nav-link>
         </div>
@@ -42,6 +42,10 @@
             </x-slot>
 
             <x-slot name="content">
+              <x-dropdown-link class="dark:text-gray-200" :href="route('dashboard')">
+                {{ __("Dashboard") }}
+              </x-dropdown-link>
+
               <x-dropdown-link class="dark:text-gray-200" :href="route('profile.edit')">
                 {{ __('Profile') }}
               </x-dropdown-link>
