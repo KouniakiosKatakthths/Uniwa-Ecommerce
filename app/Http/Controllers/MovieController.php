@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
-use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
@@ -31,7 +30,12 @@ class MovieController extends Controller
 
     public function now_playing()
     {
-        $now_playing = Movie::inRandomOrder()->take(5)->get();
+        $now_playing = Movie::whereHas('showtimes', function ($query) {
+            $query->where('starts_at','<=', now()->addDays(7));
+        })->get();
+
+        
+
         return view('now-playing', compact('now_playing'));
     }
 

@@ -47,7 +47,9 @@
 
   {{-- Showtimes --}}
   <section>
-    
+    <x-modal name="asd" show="true">
+      <p>asdasd</p>
+    </x-modal>
   </section>
 </div>
 @endsection
