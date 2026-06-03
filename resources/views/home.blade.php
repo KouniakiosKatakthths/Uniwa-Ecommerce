@@ -25,7 +25,7 @@
 
         {{-- Control buttons --}}
         <div class="mt-auto flex gap-4">
-          <x-button variant="ghost" class="flex items-center gap-2" href="{{ route('movies.show', [ 'movie_id' => $featured->id ]) }}">
+          <x-button variant="ghost" class="flex items-center gap-2" href="{{ route('movies.show', $featured->id) }}">
             <span>More</span>
             <svg width="15" height="15" viewBox="0 2 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 19L19 12L8 5V19Z" fill="currentColor"></path>

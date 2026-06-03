@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
-use Request;
+use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
@@ -15,17 +15,39 @@ class MovieController extends Controller
 
     public function create()  
     {
-
+        return view("dashboard.create-movie");
     } 
 
-    public function store()
+    public function store(Request $request)
     {
+        $data = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'director'    => 'required|string',
+            'rating'      => 'required|in:G,PG,PG-13,R,NC-17',
+            'duration'    => 'required|integer|min:1',
+            'trailer_url' => 'required|url',
+            'genre'       => 'required|in:' . implode(',', Movie::GENRES),
+            'release_date'=> 'required|date',
+            'featured'    => 'required|boolean',
+            'poster'      => 'required|image|max:2048',
+            'actors'      => 'nullable|string',
+        ]);
 
+        if (!empty($data['actors']))
+            $data['actors'] = array_map('trim', explode(',', $data['actors']));
+
+        if ($request->hasFile('poster')) 
+            $data['poster_url'] = $request->file('poster')->store('posters', 'public');
+        
+        unset($data['poster']); //Remove file field, we use poster_url instead
+        Movie::create($data);
+
+        return redirect()->route('movies.index')->with('success', 'Movie created successfully.');
     }
 
-    public function show(string $movie_id)
+    public function show(Movie $movie)
     {
-        $movie = Movie::find($movie_id);
         $showtimes = $movie->showtimes()
             ->whereBetween("starts_at", [today("Europe/Athens"), today("Europe/Athens")->addDays(5)->endOfDay()])
             ->orderBy("starts_at")
@@ -35,34 +57,11 @@ class MovieController extends Controller
         return view('movie', compact('movie', 'showtimes'));
     }
 
-    public function now_playing(Request $request)
+    public function edit()
     {
-        $now_playing = Movie::whereHas('showtimes', function ($query) {
-                $query->where('starts_at', '>=', now("Europe/Athens"))->where('starts_at', '<=', now("Europe/Athens")->addDays(5));
-            })
-            ->when(request('search'), fn($q) => $q->where('title', 'like', '%'.request('search').'%'))
-            ->when(request('day'), fn($q) => $q->whereHas('showtimes', fn($q) =>
-                $q->whereDate('starts_at', request('day'))
-            ))
-            ->orderByDesc('featured')
-            ->get();
-
-        return view('now-playing', compact('now_playing'));
     }
 
-    public function upcoming()
-    {
-        $upcoming = Movie::whereHas('showtimes', function ($query) {
-                $query->where('starts_at', '>', now("Europe/Athens")->addDays(5));
-            })
-            ->when(request('search'), fn($q) => $q->where('title', 'like', '%'.request('search').'%'))
-            ->orderByDesc('featured')
-            ->get();
+    public function update()  {}
 
-        return view('upcoming', compact('upcoming'));
-    }
-
-    public function edit()    {} // GET  /movies/{movie}/edit → edit form
-    public function update()  {} // PUT  /movies/{movie}  → save changes
-    public function destroy() {} // DELETE /movies/{movie} → delete
+    public function destroy() {}
 }

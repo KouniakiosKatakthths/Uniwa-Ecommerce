@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Movie extends Model
 {
     use HasFactory;
+    
+    public const GENRES = [
+        'Action', 'Comedy', 'Drama', 'Horror', 'Thriller',
+        'Sci-Fi', 'Romance', 'Animation', 'Documentary', 'Fantasy'
+    ];
 
     public $incrementing = false;
     protected $keyType = 'string';

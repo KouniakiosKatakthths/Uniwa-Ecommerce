@@ -153,6 +153,13 @@ if [ -f "artisan" ]; then
     if [[ "$RUN_MIGRATE" =~ ^[Yy]$ ]]; then
         info "Running migrations..."
         php artisan migrate --force
+
+        # Run seeders
+        read -p "$(echo -e ${YELLOW}Seed database with sample data? [y/N]:${NC} )" RUN_SEED
+        if [[ "$RUN_SEED" =~ ^[Yy]$ ]]; then
+            info "Seeding database..."
+            php artisan db:seed --force
+        fi
     fi
 fi
 
