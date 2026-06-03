@@ -23,15 +23,22 @@ Route::get('/newplaying', [ShowtimeController::class, "now_playing"])->name("mov
 Route::get("/upcoming", [ShowtimeController::class, "upcoming"])->name("movies.upcoming");
 Route::get("/information", fn () => view("Information"))->name('info');
 
-Route::resource('movies', MovieController::class);
+Route::middleware(['auth', 'role:clerk,admin'])->group(function () {
+    Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+});
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('movies', MovieController::class)->only(['destroy']);
+});
+Route::resource('movies', MovieController::class)->only(['show']);
 
 Route::get('/dashboard', fn () => view('dashboard.dashboard'))
-    ->middleware(['auth', 'verified'])->name('dashboard');
+->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () 
 {
     Route::get('/movie/{movie_id}/ticket', [TicketController::class, "purchase_for_showtime"])->name("movie.ticket");
 
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
