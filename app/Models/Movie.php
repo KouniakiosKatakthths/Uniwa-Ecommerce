@@ -14,6 +14,8 @@ class Movie extends Model
         'Sci-Fi', 'Romance', 'Animation', 'Documentary', 'Fantasy'
     ];
 
+    public const RATINGS = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+
     public $incrementing = false;
     protected $keyType = 'string';
 

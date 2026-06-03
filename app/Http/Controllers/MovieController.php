@@ -24,7 +24,7 @@ class MovieController extends Controller
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
             'director'    => 'required|string',
-            'rating'      => 'required|in:G,PG,PG-13,R,NC-17',
+            'rating'      => 'required|in:' . implode(',', Movie::RATINGS),
             'duration'    => 'required|integer|min:1',
             'trailer_url' => 'required|url',
             'genre'       => 'required|in:' . implode(',', Movie::GENRES),

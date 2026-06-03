@@ -84,7 +84,7 @@
         dark:placeholder-gray-600 dark:bg-[#293447] dark:border-white/10 dark:text-gray-300 dark:border-solid dark:border dark:focus:border-white/20
         focus:border-indigo-500 focus:ring-indigo-500 
         rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none">
-        @foreach(['G', 'PG', 'PG-13', 'R', 'NC-17'] as $rating)
+        @foreach(App\Models\Movie::RATINGS as $rating)
           <option value="{{ $rating }}" {{ old('rating', $movie?->rating) === $rating ? 'selected' : '' }}>
             {{ $rating }}
           </option>
@@ -125,8 +125,7 @@
   </div>
 
   {{-- Submit --}}
-  <div class="flex gap-3 ">
-    <x-button variant="ghost" :href="route('movies.index')">Cancel</x-button>
+  <div class="flex gap-3 justify-end">
     <x-button type="submit">
       {{ $isEditing ? 'Update Movie' : 'Create Movie' }}
     </x-button>
