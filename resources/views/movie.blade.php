@@ -37,22 +37,90 @@
         </div>
         
         {{-- Buttons --}}
-        <div class="flex gap-4">
-          <x-button x-data="" variant="ghost" x-on:click.prevent="$dispatch('open-modal', 'movie-trailer-container')">Watch trailer</x-button>
-          <x-button>Get tickets</x-button>
+        <div x-data="{ showtimes: @js($showtimes), }" class="flex gap-4">
+          <x-button variant="ghost" @click.prevent="$dispatch('open-modal', 'movie-trailer-container')">Watch trailer</x-button>
+          <x-button x-show="showtimes.length !== 0" @click="document.getElementById('tickets').scrollIntoView({ behavior: 'smooth' })">
+            Get tickets
+          </x-button>
         </div>
       </div>
     </div>
   </section>
 
   {{-- Showtimes --}}
-  <section>
+  <section 
+    id="tickets"
+    class="max-w-7xl w-full min-h-100 mx-auto px-6 lg:px-8 py-10"
+    x-data="{
+      days: @js(
+        collect(range(0, 4))->map(fn($i) => [
+          'label'     => now("Europe/Athens")->addDays($i)->format('D'),     // Mon
+          'sublabel'  => now("Europe/Athens")->addDays($i)->format('M j'),   // May 29
+          'key'       => now("Europe/Athens")->addDays($i)->toDateString(),  // 2026-05-29
+        ])
+      ),
+      showtimes: @js($showtimes),
+      selected: Object.keys(@js($showtimes))[0] ?? '{{ now("Europe/Athens")->toDateString() }}',
+      get current() { return this.showtimes[this.selected] ?? [] }
+    }">
+    <h2 class="text-gray-200 text-2xl font-bold mb-6">Showtimes</h2>
+
+    {{-- No showtimes message --}}
+    <div x-show="showtimes.length === 0" class="text-gray-400 text-lg font-bold">
+      <p>No showtimes are sceduled for this movie yet.</p>
+    </div>
+
+    {{-- Showtime selectors --}}
+    <div x-show="showtimes.length !== 0">
+      {{-- Day pills --}}
+      <div class="flex gap-3 mb-8 flex-wrap">
+        <template x-for="day in days" :key="day.key">
+          <button
+            @click="selected = day.key"
+            :class="selected === day.key
+              ? 'bg-accent text-gray-900 shadow-[0_0_16px_rgba(245,158,11,0.5)]'
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'"
+            class="flex flex-col items-center px-5 py-3 rounded-xl transition-all duration-200 min-w-18 cursor-pointer">
+            <span class="text-xs font-semibold uppercase tracking-widest" x-text="day.label"></span>
+            <span class="text-base font-bold mt-0.5" x-text="day.sublabel"></span>
+          </button>
+        </template>
+      </div>
+
+      {{-- Showtime slots --}}
+      <div class="flex flex-col gap-3">
+        <template x-for="showtime in current" :key="showtime.id">
+          <div class="group flex items-center justify-between px-6 py-3 rounded-xl border border-gray-700 bg-gray-800/60 hover:border-accent hover:bg-gray-800 transition-all duration-200">
+            <div class="flex items-center min-w-60 w-[30%] justify-between">
+              <span class="text-gray-200 text-3xl"
+                    x-text="new Date(showtime.starts_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})">
+              </span>
+              <span class="text-gray-500 uppercase" x-text="showtime.room"></span>
+            </div>
+            <x-button>Get tickets</x-button>
+          </div>
+        </template>
+      </div>
+
+      {{-- Empty day --}}
+      <div x-show="current.length === 0" x-transition class="text-gray-400 text-lg font-bold">
+        No showtimes available for this day.
+      </div>
+    </div>
   </section>
 </div>
 
-<x-modal name="movie-trailer-container" x-data="" focusable>
-  <div class="p-10 text-gray-200">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/06gXGAHnRyE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+{{-- Trailer modal --}}
+<x-modal name="movie-trailer-container" maxWidth="5xl" x-data focusable>
+  <div class="flex flex-col gap-5 p-5 text-gray-200">
+    <div class="flex justify-between">
+      <div class="flex gap-1">
+        <h1 class="text-gray-200 text-2xl font-bold ">Trailer -</h1>
+        <h1 class="text-gray-200 text-2xl font-bold first-letter:uppercase"> {{ $movie->title }}</h1>
+      </div>
+      <x-primary-button class="">X</x-primary-button>
+    </div>
+    <iframe x-ref="trailer" class="w-full" height="550" src="https://www.youtube.com/embed/06gXGAHnRyE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 </x-modal>
 @endsection

@@ -45,11 +45,11 @@
         <span>Show all</span>
         <svg width="15" height="15" viewBox="0 2 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 19L19 12L8 5V19Z" fill="currentColor"></path>
-        </svg>
+      </svg>
       </x-button>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       @foreach ($nowPlaying as $movie)
         <x-movie-card :movie="$movie"></x-movie-card>
       @endforeach
