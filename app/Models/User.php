@@ -45,6 +45,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->id = (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
     public function isAdmin(): bool  { return $this->role === 'admin'; }
     public function isClerk(): bool  { return $this->role === 'clerk' || $this->role === 'admin'; }
     public function isUser(): bool   { return $this->role === 'user'; }

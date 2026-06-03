@@ -25,6 +25,7 @@ Route::get("/information", fn () => view("Information"))->name('info');
 
 Route::middleware(['auth', 'role:clerk,admin'])->group(function () {
     Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('showtimes', ShowtimeController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 });
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('movies', MovieController::class)->only(['destroy']);

@@ -8,10 +8,35 @@ use Illuminate\Http\Request;
 
 class ShowtimeController extends Controller
 {
+    public function index()   
+    {
+    }
+
+    public function create()  
+    {
+        return view("dashboard.create-showtime");
+    }
+
+    public function store(Request $request)
+    {
+    }
+
     public function show(string $showtime_id)
     {
         $showtime = Showtime::find($showtime_id);
         // return view("", compact(""));
+    }
+
+    public function edit()
+    {
+    }
+
+    public function update()
+    {
+    }
+
+    public function destroy()
+    {
     }
 
     public function now_playing(Request $request)

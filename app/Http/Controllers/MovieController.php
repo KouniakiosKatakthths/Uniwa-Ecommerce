@@ -9,8 +9,9 @@ class MovieController extends Controller
 {
     public function index()   
     {
-        $now_playing = Movie::inRandomOrder()->take(5)->get();
-        
+        $movies = Movie::orderBy("created_at", "desc")->get();
+
+        return view("dashboard.list-movies", compact("movies"));        
     }
 
     public function create()  
