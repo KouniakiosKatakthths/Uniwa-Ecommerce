@@ -165,4 +165,5 @@ fi
 
 echo ""
 echo -e "${GREEN} Setup complete!${NC}"
-echo -e "  Start the dev server with: ${YELLOW}php artisan serve${NC}"
+echo -e "  Start the dev server with: ${YELLOW}npm run dev${NC}"
+echo -e "  Using npm for tailwind css support"
