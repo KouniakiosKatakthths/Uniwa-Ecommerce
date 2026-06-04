@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use \App\Enums\UserRole;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
 
-    public const ROLES = ['user', 'clerk', 'admin'];
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -43,17 +45,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'role' => UserRole::class
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            $model->id = (string) \Illuminate\Support\Str::uuid();
-        });
-    }
-
-    public function isAdmin(): bool  { return $this->role === 'admin'; }
-    public function isClerk(): bool  { return $this->role === 'clerk' || $this->role === 'admin'; }
-    public function isUser(): bool   { return $this->role === 'user'; }
+    public function isAdmin(): bool  { return $this->role === UserRole::Admin; }
+    public function isClerk(): bool  { return $this->role === UserRole::Clerk || $this->role === UserRole::Admin; }
+    public function isUser(): bool   { return $this->role === UserRole::User; }
 }

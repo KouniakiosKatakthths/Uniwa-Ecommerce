@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\MovieRating;
+use App\Enums\MovieGenre;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,10 +24,10 @@ class MovieFactory extends Factory
             'poster_url' => "https://img.magnific.com/free-vector/cinema-movie-entertainment-poster_98292-1670.jpg?semt=ais_hybrid&w=740&q=80",
             'trailer_url' => "https://www.youtube.com/watch?v=06gXGAHnRyE",
             'duration' => fake()->numberBetween(90, 180),
-            'rating' => fake()->randomElement(['PG', 'PG-13', 'R']),
+            'rating' => fake()->randomElement(MovieRating::cases())->value,
             'actors' => [ fake()->words(2, true), fake()->words(2, true), fake()->words(2, true) ],
             'director' => fake()->words(2, true),
-            'genre' => fake()->word(),
+            'genre' => fake()->randomElement(MovieGenre::cases())->value,
             'featured' => fake()->boolean(),
             'release_date' => fake()->dateTime($max = 'now', $timezone = null),
         ];

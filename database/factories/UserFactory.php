@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use \App\Enums\UserRole;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -45,14 +46,14 @@ class UserFactory extends Factory
     public function as_admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'admin',
+            'role' => UserRole::Admin,
         ]);
     }
 
     public function as_clerk(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'clerk',
+            'role' => UserRole::Clerk,
         ]);
     }
 }

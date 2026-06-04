@@ -2,19 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\MovieGenre;
+use App\Enums\MovieRating;
 
 class Movie extends Model
 {
-    use HasFactory;
-    
-    public const GENRES = [
-        'Action', 'Comedy', 'Drama', 'Horror', 'Thriller',
-        'Sci-Fi', 'Romance', 'Animation', 'Documentary', 'Fantasy'
-    ];
-
-    public const RATINGS = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+    use HasFactory, HasUuids;
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -37,20 +33,14 @@ class Movie extends Model
         'actors' => 'array',
         'release_date' => 'date',
         'featured' => 'boolean',
+        'rating' => MovieRating::class,
+        'genre' => MovieGenre::class,
     ];
 
     //Helper to get duration as "2h 18m"
     public function getDurationFormatted(): string
     {
         return floor($this->duration / 60) . 'h ' . ($this->duration % 60) . 'm';
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            $model->id = (string) \Illuminate\Support\Str::uuid();
-        });
     }
 
     public function showtimes()

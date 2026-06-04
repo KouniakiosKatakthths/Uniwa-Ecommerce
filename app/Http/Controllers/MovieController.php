@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovieGenre;
+use App\Enums\MovieRating;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Enum;
 
 class MovieController extends Controller
 {
@@ -40,10 +43,10 @@ class MovieController extends Controller
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
             'director'    => 'required|string',
-            'rating'      => 'required|in:' . implode(',', Movie::RATINGS),
+            'rating'      => ['required', new Enum(MovieRating::class)],
             'duration'    => 'required|integer|min:1',
             'trailer_url' => 'required|url',
-            'genre'       => 'required|in:' . implode(',', Movie::GENRES),
+            'genre'       => ['required', new Enum(MovieGenre::class)],
             'release_date'=> 'required|date',
             'featured'    => 'required|boolean',
             'poster'      => 'required|image|max:2048',
