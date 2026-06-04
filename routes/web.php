@@ -22,6 +22,7 @@ Route::get('/', [HomeController::class,'index'])->name('home');
 Route::get('/newplaying', [ShowtimeController::class, "now_playing"])->name("movies.now");
 Route::get("/upcoming", [ShowtimeController::class, "upcoming"])->name("movies.upcoming");
 Route::get("/information", fn () => view("Information"))->name('info');
+Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
 
 Route::middleware(['auth', 'role:clerk,admin'])->group(function () {
     Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);

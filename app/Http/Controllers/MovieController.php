@@ -7,6 +7,21 @@ use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
+    public function search(Request $request)
+    {
+        if ($id = $request->get('id')) 
+            return response()->json(Movie::findOrFail($id, ['id', 'title']));
+        
+
+        $movies = Movie::query()
+            ->where('title', 'LIKE', "%{$request->get('q', '')}%")
+            ->orderBy('title')
+            ->limit(10)
+            ->get(['id', 'title']);
+
+        return response()->json($movies);
+    }
+
     public function index()   
     {
         $movies = Movie::orderBy("created_at", "desc")->get();

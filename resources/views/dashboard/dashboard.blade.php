@@ -19,7 +19,7 @@
           <x-button class="w-full sm:w-auto" :href="route('movies.create')">Create movie</x-button>
         </div>
 
-        {{-- Showtimes management --}}
+        {{-- Showtimes management --}}  
         <div class="flex items-center gap-4 mt-4 sm:flex-row flex-col">
           <h2 class="text-lg">Showtimes</h2>
           <x-button class="w-full sm:w-auto" :href="route('showtimes.index')">List all</x-button>

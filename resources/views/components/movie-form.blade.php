@@ -78,7 +78,6 @@
   <div class="flex gap-4">
     <div class="flex flex-col gap-1 w-1/2">
       <x-input-label>Rating</x-input-label>
-      {{-- dark:placeholder-gray-600 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:border-solid dark:border-1 dark:focus:border-white/20 --}}
       <select name="rating" class="
         border-gray-100
         dark:placeholder-gray-600 dark:bg-[#293447] dark:border-white/10 dark:text-gray-300 dark:border-solid dark:border dark:focus:border-white/20

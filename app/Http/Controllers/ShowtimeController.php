@@ -19,6 +19,16 @@ class ShowtimeController extends Controller
 
     public function store(Request $request)
     {
+        $data = $request->validate([
+            'movie_id'     => ['required', 'string', 'uuid', 'exists:movies,id'],
+            'room'         => ['required', 'string', 'max:255'],
+            'starts_at'    => ['required', 'date', 'after:now'],
+            'ticket_price' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        Showtime::create($data);
+
+        return redirect()->route('showtimes.index')->with('success', 'Showtime created successfully.');
     }
 
     public function show(string $showtime_id)
@@ -31,8 +41,17 @@ class ShowtimeController extends Controller
     {
     }
 
-    public function update()
+    public function update(Request $request, Showtime $showtime)
     {
+        $data = $request->validate([
+            'movie_id'     => ['required', 'string', 'uuid', 'exists:movies,id'],
+            'room'         => ['required', 'string', 'max:255'],
+            'starts_at'    => ['required', 'date', 'after:now'],
+            'ticket_price' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $showtime->update($data);
+        return redirect()->route('showtimes.index')->with('success', 'Showtime updated successfully.');
     }
 
     public function destroy()
