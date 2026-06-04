@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
@@ -18,17 +19,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+$clerk = UserRole::Clerk->value;  // 'clerk'
+$admin = UserRole::Admin->value;  // 'admin'
+
 Route::get('/', [HomeController::class,'index'])->name('home');
 Route::get('/newplaying', [ShowtimeController::class, "now_playing"])->name("movies.now");
 Route::get("/upcoming", [ShowtimeController::class, "upcoming"])->name("movies.upcoming");
 Route::get("/information", fn () => view("Information"))->name('info');
 Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
 
-Route::middleware(['auth', 'role:clerk,admin'])->group(function () {
+Route::middleware(['auth', "role:$clerk,$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);
     Route::resource('showtimes', ShowtimeController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::get('/validate',  [TicketController::class, 'validateIndex'])->name('tickets.validate');
+    Route::post('/validate', [TicketController::class, 'validateTicket'])->name('tickets.validate.submit');
 });
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', "role:$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['destroy']);
 });
 Route::resource('movies', MovieController::class)->only(['show']);
@@ -38,8 +45,9 @@ Route::get('/dashboard', fn () => view('dashboard.dashboard'))
 
 Route::middleware('auth')->group(function () 
 {
-    Route::get('/movie/{movie_id}/ticket', [TicketController::class, "purchase_for_showtime"])->name("movie.ticket");
-
+    Route::get('/showtimes/{showtime}/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/showtimes/{showtime}/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

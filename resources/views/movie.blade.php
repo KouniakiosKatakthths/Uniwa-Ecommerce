@@ -97,7 +97,7 @@
               </span>
               <span class="text-gray-500 uppercase" x-text="showtime.room"></span>
             </div>
-            <x-button>Get tickets</x-button>
+            <x-button x-bind:href="`/showtimes/${showtime.id}/tickets/create`">Get tickets</x-button>
           </div>
         </template>
       </div>

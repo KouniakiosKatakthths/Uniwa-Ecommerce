@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use \App\Enums\TicketStatus;
 
 class Ticket extends Model
 {
@@ -24,7 +25,9 @@ class Ticket extends Model
         'barcode',
     ];
 
-    protected $casts = ['status' => TicketStatus::class];
+    protected $casts = [
+        'status' => TicketStatus::class
+    ];
 
     public function user()
     {

@@ -51,4 +51,9 @@ class User extends Authenticatable
     public function isAdmin(): bool  { return $this->role === UserRole::Admin; }
     public function isClerk(): bool  { return $this->role === UserRole::Clerk || $this->role === UserRole::Admin; }
     public function isUser(): bool   { return $this->role === UserRole::User; }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

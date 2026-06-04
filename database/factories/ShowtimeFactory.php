@@ -21,7 +21,6 @@ class ShowtimeFactory extends Factory
             'starts_at' => $this->faker->dateTimeThisYear('now', null),
             'ticket_price' => $this->faker->numberBetween(10, 50),
             'total_seats' => 100,
-            'available_seats' => $this->faker->numberBetween(0, 100),
         ];
     }
 

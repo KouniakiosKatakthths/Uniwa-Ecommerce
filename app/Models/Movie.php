@@ -48,7 +48,6 @@ class Movie extends Model
         return $this->hasMany(Showtime::class, 'movie_id', 'id');
     }
 
-    // User model
     public function tickets()
     {
         return $this->hasMany(Ticket::class);

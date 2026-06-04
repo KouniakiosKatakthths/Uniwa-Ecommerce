@@ -18,7 +18,6 @@ return new class extends Migration
             $table->dateTime("starts_at");
             $table->decimal("ticket_price");
             $table->integer('total_seats')->default(100);
-            $table->integer('available_seats')->default(100);
             $table->timestamps();
 
             $table->foreign('movie_id')->references('id')->on('movies')->cascadeOnDelete();
