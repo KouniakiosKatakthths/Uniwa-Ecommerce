@@ -90,7 +90,7 @@
       {{-- Showtime slots --}}
       <div class="flex flex-col gap-3">
         <template x-for="showtime in current" :key="showtime.id">
-          <div class="group flex items-center justify-between px-6 py-3 rounded-xl border border-gray-700 bg-gray-800/60 hover:border-accent hover:bg-gray-800 transition-all duration-200">
+          <x-card variant="accent">
             <div class="flex items-center min-w-60 w-[30%] justify-between">
               <span class="text-gray-200 text-3xl"
                     x-text="new Date(showtime.starts_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})">
@@ -98,7 +98,7 @@
               <span class="text-gray-500 uppercase" x-text="showtime.room"></span>
             </div>
             <x-button x-bind:href="`/showtimes/${showtime.id}/tickets/create`">Get tickets</x-button>
-          </div>
+          </x-card>
         </template>
       </div>
 

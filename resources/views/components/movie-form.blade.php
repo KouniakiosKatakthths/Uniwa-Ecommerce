@@ -46,7 +46,12 @@
   {{-- Actors --}}
   <div class="flex flex-col gap-1">
     <x-input-label>Comma separated actor names</x-input-label>
-    <x-text-input textarea="true" name="actors" value="{{ old('actors', $movie?->actors) }}" placeholder="Actor1, Actor2, ..."></x-text-input>
+    <x-text-input 
+      textarea="true" 
+      name="actors" 
+      value="{{ old('actors', is_array($movie?->actors) ? implode(', ', $movie->actors) : $movie?->actors) }}" 
+      placeholder="Actor1, Actor2, ...">
+    </x-text-input>
     <x-input-error :messages="$errors->get('actors')"></x-input-error>
   </div>
   

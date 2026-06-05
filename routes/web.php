@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
@@ -40,18 +41,21 @@ Route::middleware(['auth', "role:$admin"])->group(function () {
 });
 Route::resource('movies', MovieController::class)->only(['show']);
 
-Route::get('/dashboard', fn () => view('dashboard.dashboard'))
-->middleware(['auth', 'verified'])->name('dashboard');
-
+// ======== Require logged in user ======== 
 Route::middleware('auth')->group(function () 
 {
-    Route::get('/showtimes/{showtime}/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
-    Route::post('/showtimes/{showtime}/tickets', [TicketController::class, 'store'])->name('tickets.store');
-    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+// ======== Requre vefiried email for this operations ======== 
+Route::middleware(['auth', 'verified'])->group(function () 
+{
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/showtimes/{showtime}/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/showtimes/{showtime}/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
 });
 
 require __DIR__.'/auth.php';

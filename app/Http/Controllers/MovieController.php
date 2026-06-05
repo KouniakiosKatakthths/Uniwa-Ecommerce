@@ -7,6 +7,7 @@ use App\Enums\MovieRating;
 use App\Models\Movie;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
+use Storage;
 
 class MovieController extends Controller
 {
@@ -25,11 +26,13 @@ class MovieController extends Controller
         return response()->json($movies);
     }
 
-    public function index()   
+    public function index()
     {
-        $movies = Movie::orderBy("created_at", "desc")->get();
+        $movies = Movie::orderBy('created_at', 'desc')
+            ->withCount('showtimes')
+            ->paginate(15);
 
-        return view("dashboard.list-movies", compact("movies"));        
+        return view('dashboard.list-movies', compact('movies'));
     }
 
     public function create()  
@@ -76,11 +79,52 @@ class MovieController extends Controller
         return view('movie', compact('movie', 'showtimes'));
     }
 
-    public function edit()
+    public function edit(Movie $movie)
     {
+        return view('dashboard.update-movie', compact(''));
     }
 
-    public function update()  {}
+    
+    public function update(Request $request, Movie $movie)
+    {
+        $data = $request->validate([
+            'title'        => 'required|string|max:255',
+            'description'  => 'required|string',
+            'director'     => 'required|string',
+            'rating'       => ['required', new Enum(MovieRating::class)],
+            'duration'     => 'required|integer|min:1',
+            'trailer_url'  => 'required|url',
+            'genre'        => ['required', new Enum(MovieGenre::class)],
+            'release_date' => 'required|date',
+            'featured'     => 'required|boolean',
+            'poster'       => 'nullable|image|max:2048', // nullable on update
+            'actors'       => 'nullable|string',
+        ]);
 
-    public function destroy() {}
+        if (!empty($data['actors']))
+            $data['actors'] = array_map('trim', explode(',', $data['actors']));
+
+        if ($request->hasFile('poster')) {
+            // Delete old poster
+            if ($movie->poster_url)
+                Storage::disk('public')->delete($movie->poster_url);
+
+            $data['poster_url'] = $request->file('poster')->store('posters', 'public');
+        }
+
+        unset($data['poster']);
+        $movie->update($data);
+
+        return redirect()->route('movies.index')->with('success', 'Movie updated successfully.');
+    }
+
+    public function destroy(Movie $movie)
+    {
+        if ($movie->poster_url)
+            Storage::disk('public')->delete($movie->poster_url);
+
+        $movie->delete();
+
+        return redirect()->route('movies.index')->with('success', 'Movie deleted successfully.');
+    }
 }
