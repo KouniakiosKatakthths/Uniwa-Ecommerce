@@ -81,7 +81,7 @@ class MovieController extends Controller
 
     public function edit(Movie $movie)
     {
-        return view('dashboard.update-movie', compact(''));
+        return view('dashboard.update-movie', compact('movie'));
     }
 
     
@@ -96,7 +96,7 @@ class MovieController extends Controller
             'trailer_url'  => 'required|url',
             'genre'        => ['required', new Enum(MovieGenre::class)],
             'release_date' => 'required|date',
-            'featured'     => 'required|boolean',
+            'featured'     => 'required|boolean',   
             'poster'       => 'nullable|image|max:2048', // nullable on update
             'actors'       => 'nullable|string',
         ]);
