@@ -60,13 +60,13 @@
     {{-- Genre --}}
     <div class="flex flex-col gap-1 w-1/2">
       <x-input-label>Genre</x-input-label>
-      <select name="genre" class="border-gray-100 dark:placeholder-gray-600 dark:bg-[#293447] dark:border-white/10 dark:text-gray-300 dark:border-solid dark:border dark:focus:border-white/20 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none">
+      <x-selector name="genre">
         @foreach(App\Enums\MovieGenre::cases() as $genre)
           <option value="{{ $genre }}" {{ old('genre', $movie?->genre) === $genre ? 'selected' : '' }}>
             {{ $genre }}
           </option>
         @endforeach
-      </select>
+      </x-selector>
       <x-input-error :messages="$errors->get('genre')"></x-input-error>
     </div>
 
@@ -83,17 +83,13 @@
   <div class="flex gap-4">
     <div class="flex flex-col gap-1 w-1/2">
       <x-input-label>Rating</x-input-label>
-      <select name="rating" class="
-        border-gray-100
-        dark:placeholder-gray-600 dark:bg-[#293447] dark:border-white/10 dark:text-gray-300 dark:border-solid dark:border dark:focus:border-white/20
-        focus:border-indigo-500 focus:ring-indigo-500 
-        rounded-lg shadow-sm px-4 py-2 text-sm focus:outline-none">
+      <x-selector name="rating">
         @foreach(App\Enums\MovieRating::cases() as $rating)
           <option value="{{ $rating }}" {{ old('rating', $movie?->rating) === $rating ? 'selected' : '' }}>
             {{ $rating }}
           </option>
         @endforeach
-      </select>
+      </x-selector>
       <x-input-error :messages="$errors->get('rating')"></x-input-error>
     </div>
 

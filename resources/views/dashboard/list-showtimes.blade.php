@@ -1,7 +1,6 @@
 @extends('layouts.cinema')
 @section('content')
 <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
-
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-gray-200 text-3xl font-bold">Showtimes</h1>
     <x-button :href="route('showtimes.create')">Add showtime</x-button>
@@ -17,12 +16,12 @@
     />
 
     <x-text-input name="day" type="date" value="{{ request('day') }}"></x-text-input>
-    <select name="room" class="dark:bg-[#293447] dark:border-white/10 dark:text-gray-300 dark:border rounded-lg px-4 py-2 text-sm focus:outline-none">
+    <x-selector name="room">
       <option value="">All rooms</option>
       @foreach($rooms as $room)
         <option value="{{ $room }}" {{ request('room') === $room ? 'selected' : '' }}>{{ $room }}</option>
       @endforeach
-    </select>
+    </x-selector>
     <x-button type="submit">Filter</x-button>
     @if(request()->hasAny(['day', 'room']))
       <x-button variant="ghost" :href="route('showtimes.index')">Clear</x-button>
@@ -87,18 +86,21 @@
               Edit
             </x-button>
 
-            <form
-              method="POST"
-              action="{{ route('showtimes.destroy', $showtime->id) }}"
-              onsubmit="return confirm('Delete this showtime?')"
-            >
-              @csrf
-              @method('DELETE')
+            {{-- Show delete only to admin --}}
+            @if (auth()->user()->isAdmin())
+              <form
+                method="POST"
+                action="{{ route('showtimes.destroy', $showtime->id) }}"
+                onsubmit="return confirm('Delete this showtime?')"
+              >
+                @csrf
+                @method('DELETE')
 
-              <x-button type="submit" variant="danger">
-                Delete
-              </x-button>
-            </form>
+                <x-button type="submit" variant="danger">
+                  Delete
+                </x-button>
+              </form>
+            @endif
           </div>
         </x-data-grid.data>
       </x-data-grid-row>
