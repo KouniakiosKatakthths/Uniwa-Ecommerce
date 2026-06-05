@@ -1,5 +1,13 @@
 @extends("layouts.cinema")
 
+@php
+  $trailerEmbedUrl = null;
+
+  if ($movie->trailer_url) {
+    $trailerEmbedUrl = str_replace('watch?v=', 'embed/', $movie->trailer_url);
+  }
+@endphp
+
 @section("content")
 <div>
   <section class="relative">
@@ -38,7 +46,9 @@
         
         {{-- Buttons --}}
         <div x-data="{ showtimes: @js($showtimes), }" class="flex gap-4">
-          <x-button variant="ghost" @click.prevent="$dispatch('open-modal', 'movie-trailer-container')">Watch trailer</x-button>
+          @if($trailerEmbedUrl)
+            <x-button variant="ghost" @click.prevent="$dispatch('open-modal', 'movie-trailer-container')">Watch trailer</x-button>
+          @endif
           <x-button x-show="showtimes.length !== 0" @click="document.getElementById('tickets').scrollIntoView({ behavior: 'smooth' })">
             Get tickets
           </x-button>
@@ -118,9 +128,31 @@
         <h1 class="text-gray-200 text-2xl font-bold ">Trailer -</h1>
         <h1 class="text-gray-200 text-2xl font-bold first-letter:uppercase"> {{ $movie->title }}</h1>
       </div>
-      <x-primary-button class="">X</x-primary-button>
+      <x-primary-button x-on:click="$dispatch('close-modal', 'movie-trailer-container')">X</x-primary-button>
     </div>
-    <iframe x-ref="trailer" class="w-full" height="550" src="https://www.youtube.com/embed/06gXGAHnRyE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <div
+      x-data="{ trailerUrl: '{{ $trailerEmbedUrl }}' }"
+      x-on:modal-closed.window="
+        if ($event.detail === 'movie-trailer-container') {
+          $refs.trailer.src = '';
+        }
+      "
+      x-on:modal-opened.window="
+        if ($event.detail === 'movie-trailer-container') {
+          $refs.trailer.src = $refs.trailer.src = trailerUrl;
+        }
+      ">
+      <iframe
+        x-ref="trailer"
+        class="w-full"
+        height="550"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen>
+      </iframe>
+    </div>
   </div>
 </x-modal>
 @endsection
