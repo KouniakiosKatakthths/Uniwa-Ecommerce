@@ -96,10 +96,11 @@ class MovieController extends Controller
             'trailer_url'  => 'required|url',
             'genre'        => ['required', new Enum(MovieGenre::class)],
             'release_date' => 'required|date',
-            'featured'     => 'required|boolean',   
-            'poster'       => 'nullable|image|max:2048', // nullable on update
+            'poster'       => 'nullable|image|max:2048',    //Null on upgrade
             'actors'       => 'nullable|string',
         ]);
+
+        $data['featured'] = $request->boolean('featured');
 
         if (!empty($data['actors']))
             $data['actors'] = array_map('trim', explode(',', $data['actors']));

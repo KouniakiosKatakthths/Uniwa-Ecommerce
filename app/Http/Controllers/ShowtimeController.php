@@ -8,13 +8,27 @@ use Illuminate\Http\Request;
 
 class ShowtimeController extends Controller
 {
-    public function index()   
+    public function index(Request $request)   
     {
+        $showtimes = Showtime::with('movie')
+            ->when($request->day, fn($q) => $q->whereDate('starts_at', $request->day))
+            ->when($request->room, fn($q) => $q->where('room', $request->room))
+            ->when($request->filled('movie'), function ($query) use ($request) {
+                $query->whereHas('movie', function ($movieQuery) use ($request) {
+                    $movieQuery->where('title', 'like', '%' . $request->movie . '%');
+                });
+            })
+            ->orderBy('starts_at', 'desc')
+            ->paginate(20);
+
+        $rooms = Showtime::distinct()->pluck('room');
+
+        return view('dashboard.list-showtimes', compact('showtimes', 'rooms'));
     }
 
     public function create()  
     {
-        return view("dashboard.create-showtime");
+    return view("dashboard.create-showtime");
     }
 
     public function store(Request $request)
@@ -30,15 +44,16 @@ class ShowtimeController extends Controller
 
         return redirect()->route('showtimes.index')->with('success', 'Showtime created successfully.');
     }
-
+    
     public function show(string $showtime_id)
     {
         $showtime = Showtime::find($showtime_id);
         // return view("", compact(""));
     }
 
-    public function edit()
+    public function edit(Showtime $showtime)
     {
+        return view('dashboard.update-showtime', compact('showtime'));
     }
 
     public function update(Request $request, Showtime $showtime)
@@ -54,8 +69,10 @@ class ShowtimeController extends Controller
         return redirect()->route('showtimes.index')->with('success', 'Showtime updated successfully.');
     }
 
-    public function destroy()
+    public function destroy(Showtime $showtime)
     {
+        $showtime->delete();
+        return redirect()->route('showtimes.index')->with('success', 'Showtime deleted.');
     }
 
     public function now_playing(Request $request)

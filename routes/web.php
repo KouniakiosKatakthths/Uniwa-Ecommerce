@@ -23,21 +23,25 @@ use Illuminate\Support\Facades\Route;
 $clerk = UserRole::Clerk->value;  // 'clerk'
 $admin = UserRole::Admin->value;  // 'admin'
 
+//Publicly available routes
 Route::get('/', [HomeController::class,'index'])->name('home');
 Route::get('/newplaying', [ShowtimeController::class, "now_playing"])->name("movies.now");
 Route::get("/upcoming", [ShowtimeController::class, "upcoming"])->name("movies.upcoming");
 Route::get("/information", fn () => view("Information"))->name('info');
 Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.search');
 
+// ======== Require clerk or admin operations ========
 Route::middleware(['auth', "role:$clerk,$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);
-    Route::resource('showtimes', ShowtimeController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('showtimes', ShowtimeController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 
     Route::get('/validate',  [TicketController::class, 'validateIndex'])->name('tickets.validate');
     Route::post('/validate', [TicketController::class, 'validateTicket'])->name('tickets.validate.submit');
 });
+// ======== Admim only operations ========
 Route::middleware(['auth', "role:$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['destroy']);
+    Route::resource('showtimes', ShowtimeController::class)->only(['destroy']);
 });
 Route::resource('movies', MovieController::class)->only(['show']);
 
