@@ -20,7 +20,7 @@
       <form method="GET" :action="$route" class="flex flex-col gap-1">
         <x-input-label>Day</x-input-label>
         <div class="flex flex-col gap-2">
-          @for($i = 0; $i < 5; $i++)
+          @for($i = 0; $i <= 5; $i++)
             @php $day = now('Europe/Athens')->addDays($i) @endphp
             <button type="submit" name="day" value="{{ $day->format('Y-m-d') }}"
               class="text-left px-3 py-2 rounded-sm text-sm transition-colors

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('movies', function (Blueprint $table) {
             $table->uuid("id")->primary();
+            $table->uuid("tmdb_id")->index()->unique()->nullable()->comment("The id of the movie ind the tmdb database");
             $table->string('title');
             $table->text('description');
             $table->text('poster_url');

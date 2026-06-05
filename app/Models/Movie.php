@@ -16,6 +16,7 @@ class Movie extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'tmdb_id',
         'title',
         'description',
         'poster_url',

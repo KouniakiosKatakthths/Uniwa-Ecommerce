@@ -53,7 +53,7 @@
     class="max-w-7xl w-full min-h-100 mx-auto px-6 lg:px-8 py-10"
     x-data="{
       days: @js(
-        collect(range(0, 4))->map(fn($i) => [
+        collect(range(0, 5))->map(fn($i) => [
           'label'     => now("Europe/Athens")->addDays($i)->format('D'),     // Mon
           'sublabel'  => now("Europe/Athens")->addDays($i)->format('M j'),   // May 29
           'key'       => now("Europe/Athens")->addDays($i)->toDateString(),  // 2026-05-29

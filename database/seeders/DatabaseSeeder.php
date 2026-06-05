@@ -12,7 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(MovieSeeder::class);
+        // $this->call(MovieSeeder::class);
+        $this->call(TmdbMovieSeeder::class);
+        $this->call(ShowtimeSeeder::class);
         $this->call(UserSeeder::class);
     }
 }
