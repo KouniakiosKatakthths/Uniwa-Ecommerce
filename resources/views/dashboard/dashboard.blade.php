@@ -47,6 +47,24 @@
     </x-card>
   @endif
 
+  {{-- Admin only panel --}}
+  @if (auth()->user()->isAdmin())
+    <x-card class="mt-6">
+      <div class="flex flex-col gap-6">
+        <h2 class="text-lg font-semibold text-gray-200 border-b border-white/10 pb-3">Admin Tools</h2>
+
+        {{-- Users --}}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <span class="text-sm uppercase tracking-widest text-gray-500 w-28 shrink-0">Users</span>
+          <div class="flex gap-3 flex-wrap">
+            <x-button :href="route('profile.index')" variant="ghost">List all</x-button>
+            <x-button :href="route('movies.create')">Create movie</x-button>
+          </div>
+        </div>
+      </div>
+    </x-card>
+  @endif
+
   {{-- My Tickets --}}
   <x-card class="mt-6">
     <div class="flex flex-col gap-4">

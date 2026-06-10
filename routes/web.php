@@ -7,6 +7,7 @@ use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShowtimeController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,6 +45,9 @@ Route::middleware(['auth', "role:$clerk,$admin"])->group(function () {
 Route::middleware(['auth', "role:$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['destroy']);
     Route::resource('showtimes', ShowtimeController::class)->only(['destroy']);
+
+    Route::get('/dashboard/users', [ProfileController::class, 'index'])->name('profile.index');
+    Route::patch('/dashboard/users/{user}/role', [ProfileController::class, 'updateRole'])->name('profile.update-role');
 });
 Route::resource('movies', MovieController::class)->only(['show']);
 

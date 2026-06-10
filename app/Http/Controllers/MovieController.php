@@ -55,7 +55,7 @@ class MovieController extends Controller
             'featured'    => 'boolean',
             'poster'      => 'required|image|max:2048',
             'actors'      => 'nullable|string',
-            'tmdb_id' => 'nullable|integer',
+            'tmdb_id'     => 'nullable|integer',
         ]);
 
         if (!empty($data['actors']))
