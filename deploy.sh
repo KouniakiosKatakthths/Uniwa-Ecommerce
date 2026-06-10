@@ -16,16 +16,24 @@ npm run build
 # ── 2. Copy project files to deploy path ──
 info "Copying project to ${DEPLOY_PATH}..."
 sudo mkdir -p "$DEPLOY_PATH"
-sudo rsync -a --exclude='.git' --exclude='node_modules' ./ "$DEPLOY_PATH/"
+sudo rsync -a \
+  --exclude='.git' \
+  --exclude='node_modules' \
+  --exclude='public/storage' \
+  ./ "$DEPLOY_PATH/"
 
 # ── 3. Set permissions ──
 info "Setting permissions..."
-sudo chown -R www-data:www-data "$DEPLOY_PATH"
-sudo chmod -R 755 "$DEPLOY_PATH"
-sudo chmod -R 775 "$DEPLOY_PATH/storage"
-sudo chmod -R 775 "$DEPLOY_PATH/bootstrap/cache"
+sudo chown -R www-data:www-data "$DEPLOY_PATH"/storage
+sudo chown -R www-data:www-data "$DEPLOY_PATH"/bootstrap/cache
+sudo chmod -R 775 "$DEPLOY_PATH"/storage
+sudo chmod -R 775 "$DEPLOY_PATH"/bootstrap/cache
+sudo chmod -R 755 "$DEPLOY_PATH"/public
 
 # ── 4. Storage link ──
+sudo rm -rf "$DEPLOY_PATH/public/storage"
+sudo mkdir -p "$DEPLOY_PATH/storage/app/public"
+
 info "Creating storage symlink..."
 sudo php "$DEPLOY_PATH/artisan" storage:link
 
@@ -49,6 +57,7 @@ sudo tee "$VHOST_FILE" > /dev/null <<EOF
     DocumentRoot ${DEPLOY_PATH}/public
  
     <Directory ${DEPLOY_PATH}/public>
+        Options FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>

@@ -25,7 +25,7 @@ sudo apt update -qq
  
 info "Installing PHP and required extensions..."
 sudo apt install -y php php-cli php-mbstring php-xml php-curl \
-    php-zip php-bcmath php-tokenizer php-pdo php-mysql php-sqlite3
+    php-zip php-bcmath php-tokenizer php8.2-pdo php-mysql php-sqlite3
  
 info "PHP version: $(php -v | head -n 1)"
 
@@ -152,7 +152,7 @@ if [ -f "artisan" ]; then
     read -p "$(echo -e ${YELLOW}Run database migrations? [y/N]:${NC} )" RUN_MIGRATE
     if [[ "$RUN_MIGRATE" =~ ^[Yy]$ ]]; then
         info "Running migrations..."
-        php artisan migrate --force
+        php artisan migrate:fresh
 
         # Run seeders
         read -p "$(echo -e ${YELLOW}Seed database with sample data? [y/N]:${NC} )" RUN_SEED
@@ -162,6 +162,9 @@ if [ -f "artisan" ]; then
         fi
     fi
 fi
+
+# ======== SETUP STORAGE FORWARD ========
+php artisan storage:link
 
 echo ""
 echo -e "${GREEN} Setup complete!${NC}"
