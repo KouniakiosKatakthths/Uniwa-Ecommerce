@@ -11,9 +11,10 @@ class DashboardController extends Controller
         $tickets = auth()->user()
             ->tickets()
             ->with(['showtime.movie'])
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
-            ->get();
-        
+            ->paginate(5);
+
         return view('dashboard.dashboard', compact('tickets'));
     }
 }

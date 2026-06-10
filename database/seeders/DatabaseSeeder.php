@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TmdbMovieSeeder::class);
         $this->call(ShowtimeSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(TicketSeeder::class);
     }
 }

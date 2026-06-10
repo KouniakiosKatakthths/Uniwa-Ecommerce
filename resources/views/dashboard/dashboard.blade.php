@@ -86,6 +86,13 @@
       @empty
         <p class="text-gray-500 text-sm py-4 text-center">You have no tickets yet.</p>
       @endforelse
+
+      {{-- Pagination --}}
+      @if($tickets->hasPages())
+          <div class="mt-4">
+              {{ $tickets->links() }}
+          </div>
+      @endif
     </div>
   </x-card>
 </div>
