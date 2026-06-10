@@ -95,6 +95,12 @@ class ShowtimeController extends Controller
         $upcoming = Movie::whereHas('showtimes', function ($query) {
                 $query->where('starts_at', '>', now("Europe/Athens")->addDays(5));
             })
+            ->whereDoesntHave('showtimes', function ($query) {
+                $query->whereBetween('starts_at', [
+                    now("Europe/Athens"),
+                    now("Europe/Athens")->addDays(5)->endOfDay()
+                ]);
+            })
             ->when(request('search'), fn($q) => $q->where('title', 'like', '%'.request('search').'%'))
             ->orderByDesc('featured')
             ->get();

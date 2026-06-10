@@ -55,7 +55,7 @@
       @forelse($tickets as $ticket)
         <x-card variant="accent" tag="a" href="{{ route('tickets.show', $ticket) }}" class="flex gap-4 items-center">
           {{-- Poster --}}
-          <img src="{{ $ticket->showtime->movie->poster_url }}"
+          <img src="{{ $ticket->showtime->movie->getMoviePoster() }}"
               alt="{{ $ticket->showtime->movie->title }}"
               class="w-12 aspect-2/3 object-cover rounded shrink-0">
 

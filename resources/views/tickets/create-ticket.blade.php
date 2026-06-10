@@ -7,7 +7,7 @@
   <div class="flex flex-col sm:flex-row gap-6 w-full">
     <div class="relative group rounded-sm overflow-hidden w-auto shrink-0">
       <img 
-        src="{{ $showtime->movie->poster_url }}" 
+        src="{{ $showtime->movie->getMoviePoster() }}" 
         alt="{{ $showtime->movie->title }}" 
         class="sm:w-20 md:w-28 lg:w-38 max-w-80 aspect-2/3 object-cover rounded-lg transition-transform duration-500">
     </div>

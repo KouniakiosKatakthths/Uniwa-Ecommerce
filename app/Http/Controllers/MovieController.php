@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\MovieGenre;
 use App\Enums\MovieRating;
 use App\Models\Movie;
+use App\Services\TmdbMovieImporter;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 use Storage;
@@ -40,7 +41,7 @@ class MovieController extends Controller
         return view("dashboard.create-movie");
     } 
 
-    public function store(Request $request)
+    public function store(Request $request, TmdbMovieImporter $tmdb)
     {
         $data = $request->validate([
             'title'       => 'required|string|max:255',
@@ -54,6 +55,7 @@ class MovieController extends Controller
             'featured'    => 'boolean',
             'poster'      => 'required|image|max:2048',
             'actors'      => 'nullable|string',
+            'tmdb_id' => 'nullable|integer',
         ]);
 
         if (!empty($data['actors']))
@@ -63,7 +65,10 @@ class MovieController extends Controller
             $data['poster_url'] = $request->file('poster')->store('posters', 'public');
         
         unset($data['poster']); //Remove file field, we use poster_url instead
-        Movie::create($data);
+        $movie = Movie::create($data);
+
+        if ($movie->tmdb_id)
+            $tmdb->updateMovieVotes($movie, fn($msg) => logger($msg));
 
         return redirect()->route('movies.index')->with('success', 'Movie created successfully.');
     }
@@ -85,7 +90,7 @@ class MovieController extends Controller
     }
 
     
-    public function update(Request $request, Movie $movie)
+    public function update(Request $request, Movie $movie, TmdbMovieImporter $tmdb)
     {
         $data = $request->validate([
             'title'        => 'required|string|max:255',
@@ -98,6 +103,7 @@ class MovieController extends Controller
             'release_date' => 'required|date',
             'poster'       => 'nullable|image|max:2048',    //Null on upgrade
             'actors'       => 'nullable|string',
+            'tmdb_id' => 'nullable|integer',
         ]);
 
         $data['featured'] = $request->boolean('featured');
@@ -116,6 +122,9 @@ class MovieController extends Controller
 
         unset($data['poster']);
         $movie->update($data);
+
+        if ($movie->tmdb_id)
+            $tmdb->updateMovieVotes($movie, fn($msg) => logger($msg));
 
         return redirect()->route('movies.index')->with('success', 'Movie updated successfully.');
     }

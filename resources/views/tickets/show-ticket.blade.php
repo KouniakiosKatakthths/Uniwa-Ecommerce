@@ -21,7 +21,7 @@
     {{-- Top section --}}
     <div class="flex gap-5 p-6 border-b border-white/10">
       <img
-        src="{{ $ticket->showtime->movie->poster_url }}"
+        src="{{ $ticket->showtime->movie->getMoviePoster() }}"
         alt="{{ $ticket->showtime->movie->title }}"
         class="w-24 rounded-lg object-cover aspect-2/3 shrink-0">
       <div class="flex flex-col gap-1 justify-center">
