@@ -16,7 +16,6 @@ class Movie extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'tmdb_id',
         'title',
         'description',
         'poster_url',
@@ -28,6 +27,9 @@ class Movie extends Model
         'genre',
         'featured',
         'release_date',
+        'tmdb_id',
+        'tmdb_rating',
+        'tmdb_vote_count'
     ];
 
     protected $casts = [

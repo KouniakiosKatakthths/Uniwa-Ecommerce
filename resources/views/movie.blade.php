@@ -20,9 +20,14 @@
         {{-- Movie title --}}
         <div class="flex flex-col gap-2">
           <h1 class="text-gray-200 text-6xl first-letter:uppercase">{{ $movie->title }}</h1>
-          <p class="font-normal text-gray-400">
-            {{ $movie->getDurationFormatted() }} &#8226; 
+          <p class="flex font-normal text-gray-400">
+            {{ $movie->getDurationFormatted() }} 
             {{ $movie->rating }}
+            @if ($movie->tmdb_rating !== null && $movie->tmdb_vote_count !== null)
+              <span class="ml-1">&#8226; </span>
+              <span class="text-accent ml-1">★ {{ $movie->tmdb_rating }}</span>
+              <span class="text-gray-600 ml-1">({{ $movie->tmdb_vote_count }})</span>
+            @endif
           </p>
         </div>
         
@@ -34,11 +39,11 @@
 
         {{-- Movie contributors --}}
         <div class="flex flex-col gap-3">
-          <div class="flex gap-4 border-gray-600 border-b">
+          <div class="flex gap-4 pb-2 border-gray-600 border-b">
             <span class="text-gray-400 w-24 shrink-0 border-r border-gray-600 font-bold">Director:</span>
             <span class="text-gray-300">{{ $movie->director }}</span>
           </div>
-          <div class="flex gap-4 border-gray-600 border-b">
+          <div class="flex gap-4 pb-2 border-gray-600 border-b">
             <span class="text-gray-400 w-24 shrink-0 border-r border-gray-600 font-bold">Actors:</span>
             <span class="text-gray-300">{{ implode(', ', $movie->actors) }}</span>
           </div>

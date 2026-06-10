@@ -6,6 +6,7 @@ use App\Enums\MovieGenre;
 use App\Enums\MovieRating;
 use App\Models\Movie;
 use Illuminate\Support\Facades\Http;
+use Storage;
 
 class TmdbMovieImporter
 {
@@ -40,6 +41,59 @@ class TmdbMovieImporter
         return $count;
     }
 
+    public function updateMovieVotes(Movie $movie, ?callable $logger = null): array
+    {
+        $token = config('services.tmdb.token');
+
+        if (! $token) {
+            throw new \RuntimeException('Missing TMDB_TOKEN in .env');
+        }
+
+        if (! $movie->tmdb_id) {
+            $logger("Movie {$movie->title} does not have a TMDB ID.");
+
+            return [
+                'tmdb_rating' => $movie->tmdb_rating,
+                'tmdb_vote_count' => $movie->tmdb_vote_count,
+                'updated' => false,
+            ];
+        }
+
+        $logger("Fetching latest TMDB votes for: {$movie->title}");
+
+        $details = $this->fetchMovieDetails($token, $movie->tmdb_id);
+
+        if (! $details) {
+            $logger("Could not fetch TMDB details for: {$movie->title}");
+
+            return [
+                'tmdb_rating' => $movie->tmdb_rating,
+                'tmdb_vote_count' => $movie->tmdb_vote_count,
+                'updated' => false,
+            ];
+        }
+
+        $rating = isset($details['vote_average'])
+            ? round((float) $details['vote_average'], 1)
+            : null;
+
+        $voteCount = isset($details['vote_count'])
+            ? (int) $details['vote_count']
+            : 0;
+
+        $movie->update([
+            'tmdb_rating' => $rating,
+            'tmdb_vote_count' => $voteCount,
+        ]);
+
+        $logger("Updated {$movie->title}: {$rating}/10 from {$voteCount} votes.");
+
+        return [
+            'tmdb_rating' => $rating,
+            'tmdb_vote_count' => $voteCount,
+            'updated' => true,
+        ];
+    }
     public function importByTitle(string $title): ?Movie
     {
         $token = config('services.tmdb.token');
@@ -82,6 +136,13 @@ class TmdbMovieImporter
                 'featured' => false,
                 'director' => $this->getDirectorName($credits),
                 'actors' => $this->getActors($credits, 10),
+                'tmdb_rating' => isset($details['vote_average'])
+                    ? round((float) $details['vote_average'], 1)
+                    : null,
+
+                'tmdb_vote_count' => isset($details['vote_count'])
+                    ? (int) $details['vote_count']
+                    : 0,
             ]
         );
     }
@@ -203,7 +264,32 @@ class TmdbMovieImporter
 
     private function posterUrl(?string $path): ?string
     {
-        return $path ? 'https://image.tmdb.org/t/p/w500' . $path : null;
+        if (!$path) return null;
+
+        $tmdbUrl = 'https://image.tmdb.org/t/p/w500' . $path;
+        return $this->downloadPoster($tmdbUrl, $path);
+    }
+
+
+    private function downloadPoster(string $url, string $tmdbPath): ?string
+    {
+        // Use the TMDB filename as the local filename
+        $filename = 'posters/' . ltrim($tmdbPath, '/');
+
+        // Skip download if already exists
+        if (Storage::disk('public')->exists($filename)) {
+            return Storage::disk('public')->url($filename);
+        }
+
+        $response = Http::timeout(15)->get($url);
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        Storage::disk('public')->put($filename, $response->body());
+
+        return Storage::disk('public')->url($filename);
     }
 
     private function mapGenre(?string $genre): MovieGenre

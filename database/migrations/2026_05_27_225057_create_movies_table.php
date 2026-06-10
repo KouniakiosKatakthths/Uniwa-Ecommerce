@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('movies', function (Blueprint $table) {
             $table->uuid("id")->primary();
-            $table->uuid("tmdb_id")->index()->unique()->nullable()->comment("The id of the movie ind the tmdb database");
             $table->string('title');
             $table->text('description');
             $table->text('poster_url');
@@ -27,6 +26,9 @@ return new class extends Migration
             $table->enum('genre', array_column(MovieGenre::cases(),'value'));
             $table->boolean('featured')->default(false);
             $table->date('release_date');
+            $table->bigInteger("tmdb_id")->index()->unique()->nullable()->comment("The id of the movie ind the tmdb database");
+            $table->float("tmdb_rating")->nullable()->comment("The rating of the movie supplied from the tmdb");
+            $table->bigInteger("tmdb_vote_count")->nullable()->comment("The amount of votes from the tmdb database");
             $table->timestamps();
         });
     }

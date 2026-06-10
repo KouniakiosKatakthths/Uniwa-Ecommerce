@@ -18,7 +18,9 @@
             <p class="text-sm font-normal text-gray-600">
               {{ $featured->rating }} &#8226; 
               {{ $featured->getDurationFormatted() }} &#8226; 
-              <span class="bottom-2 right-2 text-sm text-accent font-medium">★ 4.8</span>
+              @if ($featured->tmdb_rating !== null)
+                <span class="bottom-2 right-2 text-sm text-accent font-medium">★ {{ $featured->tmdb_rating }}</span>
+              @endif
             </p>
           </div>
         </div>
