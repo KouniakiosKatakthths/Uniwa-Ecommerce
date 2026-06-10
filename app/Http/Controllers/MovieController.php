@@ -51,7 +51,7 @@ class MovieController extends Controller
             'trailer_url' => 'required|url',
             'genre'       => ['required', new Enum(MovieGenre::class)],
             'release_date'=> 'required|date',
-            'featured'    => 'required|boolean',
+            'featured'    => 'boolean',
             'poster'      => 'required|image|max:2048',
             'actors'      => 'nullable|string',
         ]);
@@ -105,7 +105,8 @@ class MovieController extends Controller
         if (!empty($data['actors']))
             $data['actors'] = array_map('trim', explode(',', $data['actors']));
 
-        if ($request->hasFile('poster')) {
+        if ($request->hasFile('poster')) 
+        {
             // Delete old poster
             if ($movie->poster_url)
                 Storage::disk('public')->delete($movie->poster_url);

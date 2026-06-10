@@ -273,23 +273,17 @@ class TmdbMovieImporter
 
     private function downloadPoster(string $url, string $tmdbPath): ?string
     {
-        // Use the TMDB filename as the local filename
         $filename = 'posters/' . ltrim($tmdbPath, '/');
 
-        // Skip download if already exists
-        if (Storage::disk('public')->exists($filename)) {
-            return Storage::disk('public')->url($filename);
+        if (!Storage::disk('public')->exists($filename)) 
+        {
+            $response = Http::timeout(15)->get($url);
+            if ($response->failed()) return null;
+
+            Storage::disk('public')->put($filename, $response->body());
         }
 
-        $response = Http::timeout(15)->get($url);
-
-        if ($response->failed()) {
-            return null;
-        }
-
-        Storage::disk('public')->put($filename, $response->body());
-
-        return Storage::disk('public')->url($filename);
+        return $filename;
     }
 
     private function mapGenre(?string $genre): MovieGenre

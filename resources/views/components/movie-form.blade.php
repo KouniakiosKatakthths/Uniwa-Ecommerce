@@ -13,6 +13,12 @@
     @method('PUT')
   @endif
 
+  <div class="flex flex-col gap-1">
+    <x-input-label>TMDB id</x-input-label>
+    <x-text-input name="tmdb_id" type="number" value="{{ old('tmdb_id', $movie?->tmdb_id) }}" placeholder="TMDB id"></x-text-input>
+    <x-input-error :messages="$errors->get('tmdb_id')"></x-input-error>
+  </div>
+
   {{-- Title --}}
   <div class="flex flex-col gap-1">
     <x-input-label>Title</x-input-label>
@@ -117,7 +123,7 @@
   <div class="flex flex-col gap-1">
     <x-input-label>Poster</x-input-label>
     @if($isEditing && $movie->poster_url)
-      <img src="{{ $movie->poster_url }}" class="w-24 rounded-lg aspect-2/3 object-cover mb-2">
+      <img src="{{ $movie->getMoviePoster() }}" class="w-24 rounded-lg aspect-2/3 object-cover mb-2">
     @endif
     <input type="file" name="poster" accept="image/*"
       class="text-gray-400 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-accent file:text-gray-900 file:cursor-pointer">

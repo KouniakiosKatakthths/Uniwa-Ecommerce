@@ -13,7 +13,7 @@
   <section class="relative">
     <div class="relative z-10 py-10 flex gap-5 max-w-7xl w-full mx-auto sm:px-6 lg:px-8">
       {{-- Movie image --}}
-      <img class="w-70 max-w-[30%] self-start aspect-2/3 shrink-0 object-cover shadow-[0_10px_40px_rgba(200,169,110,0.3)] rounded-lg duration-500 hover:scale-105" src="{{ $movie->poster_url }}">
+      <img class="w-70 max-w-[30%] self-start aspect-2/3 shrink-0 object-cover shadow-[0_10px_40px_rgba(200,169,110,0.3)] rounded-lg duration-500 hover:scale-105" src="{{ $movie->getMoviePoster() }}">
 
       {{-- Movie details --}}
       <div class="flex flex-col gap-8 w-3/4">

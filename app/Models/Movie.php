@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\MovieGenre;
 use App\Enums\MovieRating;
+use Storage;
 
 class Movie extends Model
 {
@@ -44,6 +45,13 @@ class Movie extends Model
     public function getDurationFormatted(): string
     {
         return floor($this->duration / 60) . 'h ' . ($this->duration % 60) . 'm';
+    }
+
+    public function getMoviePoster(): string
+    {
+        return $this->poster_url !== null ?
+            Storage::url($this->poster_url) :
+            asset("images/movie_placeholder.jpg");
     }
 
     public function showtimes()

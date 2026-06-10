@@ -26,7 +26,7 @@
       <x-data-grid-row>
         <x-data-grid.data>
           <div class="flex items-center gap-3">
-            <img src="{{ $movie->poster_url }}" class="w-10 aspect-2/3 object-cover rounded shrink-0">
+            <img src="{{ $movie->getMoviePoster() }}" class="w-10 aspect-2/3 object-cover rounded shrink-0">
             <div>
               <p class="text-gray-200 font-medium">{{ $movie->title }}</p>
               <p class="text-gray-500 text-xs truncate max-w-48">{{ $movie->director }}</p>
