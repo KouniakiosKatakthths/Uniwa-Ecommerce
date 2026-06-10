@@ -103,4 +103,17 @@ class TicketController extends Controller
 
         return back()->with('success', 'Ticket validated!')->with('ticket', $ticket);
     }
+
+    public function destroy(Ticket $ticket)
+    {
+        abort_unless($ticket->user_id === auth()->id() || auth()->user()->is_admin, 403);
+
+        if ($ticket->status === TicketStatus::Confirmed) {
+            return back()->with('error', 'Cannot cancel an already used ticket.');
+        }
+
+        $ticket->update(['status' => TicketStatus::Cancelled]);
+
+        return back()->with('success', 'Ticket cancelled successfully.');
+    }
 }

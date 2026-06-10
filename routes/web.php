@@ -37,6 +37,8 @@ Route::middleware(['auth', "role:$clerk,$admin"])->group(function () {
 
     Route::get('/validate',  [TicketController::class, 'validateIndex'])->name('tickets.validate');
     Route::post('/validate', [TicketController::class, 'validateTicket'])->name('tickets.validate.submit');
+
+    Route::delete('/tickets/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
 });
 // ======== Admim only operations ========
 Route::middleware(['auth', "role:$admin"])->group(function () {
