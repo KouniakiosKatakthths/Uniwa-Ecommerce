@@ -45,6 +45,54 @@ class ProfileController extends Controller
         return view('dashboard.list-users', compact('users'));
     }
 
+    public function editUser(User $user): View
+    {
+        return view('dashboard.update-user', [
+            'user' => $user,
+            'roles' => UserRole::cases(),
+        ]);
+    }
+
+    public function updateUser(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'role' => ['required', new Enum(UserRole::class)],
+            'email_verified' => ['nullable', 'boolean'],
+        ]);
+
+        //Prevent admin from editing their own role
+        if (auth()->id() === $user->id && $validated['role'] !== $user->role->value) {
+            return redirect()
+                ->route('profile.edit-user', $user)
+                ->with('error', 'You cannot change your own role.');
+        }
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = UserRole::from($validated['role']);
+
+        if ($request->boolean('email_verified')) {
+            $user->email_verified_at = $user->email_verified_at ?? now();
+        } else {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return redirect()
+            ->route('profile.index')
+            ->with('success', 'User updated successfully.');
+    }
+
     /**
      * Display the user's profile form.
      */

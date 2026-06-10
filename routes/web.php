@@ -48,6 +48,8 @@ Route::middleware(['auth', "role:$admin"])->group(function () {
 
     Route::get('/dashboard/users', [ProfileController::class, 'index'])->name('profile.index');
     Route::patch('/dashboard/users/{user}/role', [ProfileController::class, 'updateRole'])->name('profile.update-role');
+    Route::get('/dashboard/users/{user}/edit', [ProfileController::class, 'editUser'])->name('profile.edit-user');
+    Route::patch('/dashboard/users/{user}', [ProfileController::class, 'updateUser'])->name('profile.update-user');
 });
 Route::resource('movies', MovieController::class)->only(['show']);
 

@@ -27,25 +27,13 @@
         </x-data-grid.data>
 
         {{-- Role --}}
-        <x-data-grid.data>
-          @if(auth()->id() !== $user->id)
-            <form method="POST" action="{{ route('profile.update-role', $user) }}">
-              @csrf
-              @method('PATCH')
-
-              <x-selector name="role" onchange="this.form.submit()">
-                @foreach(\App\Enums\UserRole::cases() as $role)
-                  <option value="{{ $role->value }}" @selected($user->role === $role)>
-                    {{ ucfirst($role->value) }}
-                  </option>
-                @endforeach
-              </x-selector>
-            </form>
-          @else
-            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
-              {{ $user->role->value }}
-            </span>
-          @endif
+        <x-data-grid.data hidden="md"> 
+          <span class="px-2 py-0.5 rounded-full text-xs font-medium 
+            {{ $user->isAdmin() ? 'bg-red-500/20 text-red-400' : '' }} 
+            {{ $user->isClerk() && !$user->isAdmin() ? 'bg-blue-500/20 text-blue-400' : '' }} 
+            {{ $user->isUser() ? 'bg-gray-500/20 text-gray-400' : '' }}"> 
+              {{ $user->role->value }} 
+            </span> 
         </x-data-grid.data>
 
         {{-- Verified --}}
@@ -66,7 +54,7 @@
         {{-- Actions --}}
         <x-data-grid.data class="text-right">
           <div class="flex gap-2 justify-end">
-            <x-button variant="ghost">Edit</x-button>
+            <x-button variant="ghost" href="{{ route('profile.edit-user', $user) }}">Edit</x-button>
             @if (auth()->user()->id !== $user->id)
               <form method="POST" action="{{ route('profile.destroy', $user) }}"
                 onsubmit="return confirm('Delete {{ addslashes($user->name) }}?')">
