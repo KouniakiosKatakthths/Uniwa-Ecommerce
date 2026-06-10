@@ -34,7 +34,7 @@
                 <path d="M8 19L19 12L8 5V19Z" fill="currentColor"></path>
               </svg>
             </x-button>
-            <x-button>Get tickets</x-button>
+            <x-button href="{{ route('movies.show', $featured->id)  }}">Get tickets</x-button>
           </div>
         </div>
       @endif

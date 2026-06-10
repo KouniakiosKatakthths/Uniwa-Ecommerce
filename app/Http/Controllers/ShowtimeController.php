@@ -48,7 +48,7 @@ class ShowtimeController extends Controller
     public function show(string $showtime_id)
     {
         $showtime = Showtime::find($showtime_id);
-        // return view("", compact(""));
+        return view("dashboard.showtime", compact("showtime"));
     }
 
     public function edit(Showtime $showtime)

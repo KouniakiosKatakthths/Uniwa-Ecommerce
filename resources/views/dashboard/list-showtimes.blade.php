@@ -82,7 +82,11 @@
 
         <x-data-grid.data class="text-right">
           <div class="flex gap-2 justify-end">
-            <x-button variant="ghost" :href="route('showtimes.edit', $showtime->id)">
+            <x-button variant="ghost" :href="route('showtimes.show', $showtime->id)">
+              View
+            </x-button>
+
+            <x-button variant="primary" :href="route('showtimes.edit', $showtime->id)">
               Edit
             </x-button>
 
