@@ -3,6 +3,8 @@ import './theme'
 
 import Alpine from 'alpinejs';
 
+import './tmdb_lookup'
+
 window.Alpine = Alpine;
 
 Alpine.data('movieSearch', (oldMovieId = null, existingMovie = null) => ({

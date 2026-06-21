@@ -18,8 +18,6 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()              // skip if previous run is still going
             ->runInBackground()                 // don't block other scheduled tasks
             ->appendOutputTo(storage_path('logs/tmdb-ratings.log'));  // log output
-
-        
     }
 
     /**

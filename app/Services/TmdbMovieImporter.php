@@ -81,45 +81,35 @@ class TmdbMovieImporter
 
         return $count;
     }
+    
+    public function previewByTmdbId(int $tmdbId): ?array
+    {
+        $data = $this->buildMovieData($tmdbId);
+
+        if (!$data) return null;
+
+        //Enum to string for handling in frontend
+        return [
+            ...$data,
+            'genre'  => $data['genre']->value,
+            'rating' => $data['rating']->value,
+            'actors' => implode(', ', $data['actors']),
+        ];
+    }
 
     public function importByTitle(string $title, ?callable $logger = null): ?Movie
     {
         $this->withLogger($logger);
 
         $searchResult = $this->searchMovie($title);
-
         if (! $searchResult) return null;
 
-        $tmdbId = $searchResult['id'];
-        $details = $this->fetchMovieDetails($tmdbId);
-
-        if (! $details) return null;
-
-        [$credits, $trailerUrl, $certification] = [
-            $this->fetchCredits($tmdbId),
-            $this->fetchYoutubeTrailerUrl($tmdbId),
-            $this->fetchCertification($tmdbId),
-        ];
+        $data = $this->buildMovieData($searchResult['id']);
+        if (!$data) return null;
 
         return Movie::updateOrCreate(
-            ['tmdb_id' => $details['id']],
-            [
-                'title'           => $details['title'] ?? $title,
-                'description'     => $details['overview'] ?? null,
-                'poster_url'      => $this->posterUrl($details['poster_path'] ?? null),
-                'trailer_url'     => $trailerUrl,
-                'release_date'    => $details['release_date'] ?: null,
-                'duration'        => $details['runtime'] ?? null,
-                'genre'           => $this->mapGenre($details['genres'][0]['name'] ?? null),
-                'rating'          => $this->mapRating($certification),
-                'featured'        => false,
-                'director'        => $this->getDirectorName($credits),
-                'actors'          => $this->getActors($credits, 10),
-                'tmdb_rating'     => isset($details['vote_average'])
-                                        ? round((float) $details['vote_average'], 1)
-                                        : null,
-                'tmdb_vote_count' => (int) ($details['vote_count'] ?? 0),
-            ]
+            ['tmdb_id' => $data['tmdb_id']],
+            [...$data, 'featured' => false]
         );
     }
 
@@ -137,7 +127,7 @@ class TmdbMovieImporter
 
         $details = $this->fetchMovieDetails($movie->tmdb_id);
 
-        if (! $details)
+        if (!$details)
         {
             $this->log("Could not fetch TMDB details for: {$movie->title}");
             return $this->voteResult($movie->tmdb_rating, $movie->tmdb_vote_count, false);
@@ -152,7 +142,6 @@ class TmdbMovieImporter
         ]);
 
         $this->log("Updated {$movie->title}: {$rating}/10 from {$voteCount} votes.");
-
         return $this->voteResult($rating, $voteCount, true);
     }
 
@@ -221,7 +210,36 @@ class TmdbMovieImporter
         return $releaseDate['certification'] ?? null;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────
+    private function buildMovieData(int $tmdbId): ?array
+    {
+        $details = $this->fetchMovieDetails($tmdbId);
+
+        if (!$details) return null;
+
+        [$credits, $trailerUrl, $certification] = [
+            $this->fetchCredits($tmdbId),
+            $this->fetchYoutubeTrailerUrl($tmdbId),
+            $this->fetchCertification($tmdbId),
+        ];
+
+        return [
+            'tmdb_id'         => $details['id'],
+            'title'           => $details['title'] ?? null,
+            'description'     => $details['overview'] ?? null,
+            'poster_url'      => $this->posterUrl($details['poster_path'] ?? null),
+            'trailer_url'     => $trailerUrl,
+            'release_date'    => $details['release_date'] ?: null,
+            'duration'        => $details['runtime'] ?? null,
+            'genre'           => $this->mapGenre($details['genres'][0]['name'] ?? null),
+            'rating'          => $this->mapRating($certification),
+            'director'        => $this->getDirectorName($credits),
+            'actors'          => $this->getActors($credits, 10),
+            'tmdb_rating'     => isset($details['vote_average'])
+                                    ? round((float) $details['vote_average'], 1)
+                                    : null,
+            'tmdb_vote_count' => (int) ($details['vote_count'] ?? 0),
+        ];
+    }
 
     private function getDirectorName(?array $credits): ?string
     {
@@ -237,9 +255,7 @@ class TmdbMovieImporter
 
     private function getActors(?array $credits, int $limit = 10): array
     {
-        if (! $credits || empty($credits['cast'])) {
-            return [];
-        }
+        if (!$credits || empty($credits['cast'])) return [];
 
         return collect($credits['cast'])
             ->take($limit)
@@ -255,7 +271,7 @@ class TmdbMovieImporter
 
         $filename = 'posters/' . ltrim($path, '/');
 
-        if (! Storage::disk('public')->exists($filename)) 
+        if (!Storage::disk('public')->exists($filename)) 
         {
             $response = Http::timeout(15)->get(self::IMAGE_URL . $path);
 

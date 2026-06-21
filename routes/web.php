@@ -34,6 +34,8 @@ Route::get('/movies/search', [MovieController::class, 'search'])->name('movies.s
 // ======== Require clerk or admin operations ========
 Route::middleware(['auth', "role:$clerk,$admin"])->group(function () {
     Route::resource('movies', MovieController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::get('/movies/tmdb-lookup', [MovieController::class, 'tmdbLookup'])->name('movies.tmdb-lookup');
+    
     Route::resource('showtimes', ShowtimeController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);
 
     Route::get('/validate',  [TicketController::class, 'validateIndex'])->name('tickets.validate');

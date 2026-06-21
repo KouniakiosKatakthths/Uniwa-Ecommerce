@@ -6,6 +6,7 @@ use App\Enums\MovieGenre;
 use App\Enums\MovieRating;
 use App\Models\Movie;
 use App\Services\TmdbMovieImporter;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
 use Storage;
@@ -67,10 +68,7 @@ class MovieController extends Controller
         unset($data['poster']); //Remove file field, we use poster_url instead
         $movie = Movie::create($data);
 
-        if ($movie->tmdb_id)
-            $tmdb->updateMovieVotes($movie, fn($msg) => logger($msg));
-
-        return redirect()->route('movies.index')->with('success', 'Movie created successfully.');
+        return $this->redirectWithTmdbUpdate($tmdb, $movie, 'Movie created successfully.');
     }
 
     public function show(Movie $movie)
@@ -123,10 +121,7 @@ class MovieController extends Controller
         unset($data['poster']);
         $movie->update($data);
 
-        if ($movie->tmdb_id)
-            $tmdb->updateMovieVotes($movie, fn($msg) => logger($msg));
-
-        return redirect()->route('movies.index')->with('success', 'Movie updated successfully.');
+        return $this->redirectWithTmdbUpdate($tmdb, $movie, 'Movie updated successfully.');
     }
 
     public function destroy(Movie $movie)
@@ -137,5 +132,43 @@ class MovieController extends Controller
         $movie->delete();
 
         return redirect()->route('movies.index')->with('success', 'Movie deleted successfully.');
+    }
+
+    public function tmdbLookup(Request $request, TmdbMovieImporter $tmdb)
+    {
+        $request->validate(['tmdb_id' => 'required|integer']);
+
+        try 
+        {
+            $data = $tmdb->previewByTmdbId((int) $request->tmdb_id);
+            if (!$data) return response()->json(['error' => 'No movie found with that TMDB ID.'], 404);
+
+            return response()->json($data);
+        } catch (\Exception $e) 
+        {
+            if ($e->getCode() == 404) return response()->json(['error'=> 'No movie found with that TMDB ID.'],404);
+            return response()->json(['error' => "Internal server errror. Please try again later or nodify admin."], 500);
+        }
+    }
+
+    private function redirectWithTmdbUpdate(TmdbMovieImporter $tmdb, Movie $movie, string $successMessage): RedirectResponse 
+    {
+        //Successful redirection
+        $redirect = redirect()->route('movies.index')->with('success', $successMessage);
+        if (!$movie->tmdb_id) return $redirect;
+
+        try 
+        {
+            $tmdb->updateMovieVotes($movie, fn ($msg) => logger($msg));
+        } catch (\Exception $e) 
+        {
+            //Redirect with tmdb error
+            logger()->error("TMDB update failed for movie [{$movie->id}]: " . $e->getMessage());
+            return redirect()->route('movies.edit', $movie)
+                ->with('success', $successMessage)
+                ->with('warning', 'TMDB ratings could not be fetched. Did you type the correct tmdb id?');
+        }
+
+        return $redirect;
     }
 }

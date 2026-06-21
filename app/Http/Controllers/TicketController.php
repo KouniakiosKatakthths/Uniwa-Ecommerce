@@ -36,7 +36,7 @@ class TicketController extends Controller
             //Check if the requested seat is already taken
             $is_already_taken = Ticket::where('showtime_id', $showtime->id)
                 ->where('seat', $request->seat)
-                ->whereIn('status', [ TicketStatus::Cancelled ])
+                ->whereIn('status', [ TicketStatus::Pending, TicketStatus::Confirmed ])
                 ->lockForUpdate()
                 ->exists();
 
@@ -68,7 +68,6 @@ class TicketController extends Controller
     {
         return view('tickets.validate-ticket');
     }
-
 
     public function validateTicket(Request $request)
     {

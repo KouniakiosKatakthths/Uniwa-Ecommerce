@@ -13,10 +13,48 @@
     @method('PUT')
   @endif
 
-  <div class="flex flex-col gap-1">
-    <x-input-label>TMDB id</x-input-label>
-    <x-text-input name="tmdb_id" type="number" value="{{ old('tmdb_id', $movie?->tmdb_id) }}" placeholder="TMDB id"></x-text-input>
+  {{-- TMDB ID + Lookup --}}
+  <div class="flex flex-col gap-1" x-data="tmdbLookup('{{ old('tmdb_id', $movie?->tmdb_id) }}', '{{ route('movies.tmdb-lookup') }}')">
+    <x-input-label>TMDB ID</x-input-label>
+    <div class="flex gap-2">
+      <x-text-input
+        name="tmdb_id"
+        id="tmdb_id"
+        type="number"
+        value="{{ old('tmdb_id', $movie?->tmdb_id) }}"
+        placeholder="TMDB ID"
+        x-model="tmdbId"
+        class="flex-1"
+      ></x-text-input>
+      <x-button type="button" @click="lookup" x-bind:disabled="loading">
+        <span x-text="loading ? 'Looking up...' : 'Lookup'"></span>
+      </x-button>
+    </div>
     <x-input-error :messages="$errors->get('tmdb_id')"></x-input-error>
+
+    {{-- Preview Card --}}
+    <div x-show="preview || error" x-transition class="flex gap-4 p-4 rounded-xl border border-gray-700 bg-gray-800/50 mt-2">
+      {{-- Info --}}
+      <div class="flex flex-col gap-1 flex-1 min-w-0">
+        <div x-show="!error">
+          <p x-text="preview?.title" class="text-lg font-semibold text-white"></p>
+          <p x-text="meta" class="text-sm text-gray-400"></p>
+        </div>
+
+        {{-- Error --}}
+        <p x-show="error" x-text="error" class="text-sm text-red-400"></p>
+
+        {{-- Import button --}}
+        <x-button
+          type="button"
+          x-show="preview"
+          @click="importData"
+          x-bind:disabled="imported"
+          class="mt-3 w-fit">
+          <span x-text="imported ? '✓ Imported!' : 'Import Data'"></span>
+        </x-button>
+      </div>
+    </div>
   </div>
 
   {{-- Title --}}
