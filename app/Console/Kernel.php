@@ -12,7 +12,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        //Runs every six hours
+        $schedule->command('tmdb:update-ratings')
+            ->everySixHours()                           
+            ->withoutOverlapping()              // skip if previous run is still going
+            ->runInBackground()                 // don't block other scheduled tasks
+            ->appendOutputTo(storage_path('logs/tmdb-ratings.log'));  // log output
+
+        
     }
 
     /**
