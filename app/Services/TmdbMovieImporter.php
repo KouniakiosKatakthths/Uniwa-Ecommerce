@@ -5,241 +5,228 @@ namespace App\Services;
 use App\Enums\MovieGenre;
 use App\Enums\MovieRating;
 use App\Models\Movie;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
-use Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TmdbMovieImporter
 {
-    public function importFromFile(string $path, ?callable $logger = null): int
+    private const BASE_URL    = 'https://api.themoviedb.org/3';
+    private const IMAGE_URL   = 'https://image.tmdb.org/t/p/w500';
+    private const YOUTUBE_URL = 'https://www.youtube.com/watch?v=';
+
+    private PendingRequest $http;
+    private \Closure $logger;
+
+    public function __construct()
     {
-        if (! file_exists($path)) {
-            throw new \RuntimeException("Movie seed file not found: {$path}");
+        $token = config('services.tmdb.token');
+
+        if (! $token) {
+            throw new \RuntimeException('Missing TMDB_TOKEN in .env');
         }
 
+        //Single configured HTTP client reused across all methods, retry 3x with 500ms delay on failure
+        $this->http = Http::withToken($token)
+            ->acceptJson()
+            ->baseUrl(self::BASE_URL)
+            ->retry(3, 500);   
+
+        //Logs to Laravel log, replaced if caller provides one
+        $this->logger = fn (string $msg) => Log::info('[TMDB] ' . $msg);
+    }
+
+    private function log(string $message): void
+    {
+        ($this->logger)($message);
+    }
+
+    private function withLogger(?callable $logger): static
+    {
+        if ($logger) $this->logger = $logger;
+        return $this;
+    }
+
+    public function importFromFile(string $path, ?callable $logger = null): int
+    {
+        $this->withLogger($logger);
+
+        if (! file_exists($path)) 
+            throw new \RuntimeException("Movie seed file not found: {$path}");
+
         $titles = collect(file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES))
-            ->map(fn ($title) => trim($title))
+            ->map(fn ($t) => trim($t))
             ->filter()
             ->unique()
             ->values();
 
         $count = 0;
 
-        foreach ($titles as $title) {
-            $logger("Searching TMDB for: {$title}");
+        foreach ($titles as $title) 
+        {
+            $this->log("Searching TMDB for: {$title}");
 
             $movie = $this->importByTitle($title);
 
-            if (! $movie) {
-                $logger("No TMDB result found for: {$title}");
+            if (! $movie) 
+            {
+                $this->log("No TMDB result found for: {$title}");
                 continue;
             }
 
             $count++;
-            $logger("Saved: {$movie->title}");
+            $this->log("Saved: {$movie->title}");
         }
 
         return $count;
     }
 
-    public function updateMovieVotes(Movie $movie, ?callable $logger = null): array
+    public function importByTitle(string $title, ?callable $logger = null): ?Movie
     {
-        $token = config('services.tmdb.token');
+        $this->withLogger($logger);
 
-        if (! $token) {
-            throw new \RuntimeException('Missing TMDB_TOKEN in .env');
-        }
+        $searchResult = $this->searchMovie($title);
 
-        if (! $movie->tmdb_id) {
-            $logger("Movie {$movie->title} does not have a TMDB ID.");
-
-            return [
-                'tmdb_rating' => $movie->tmdb_rating,
-                'tmdb_vote_count' => $movie->tmdb_vote_count,
-                'updated' => false,
-            ];
-        }
-
-        $logger("Fetching latest TMDB votes for: {$movie->title}");
-
-        $details = $this->fetchMovieDetails($token, $movie->tmdb_id);
-
-        if (! $details) {
-            $logger("Could not fetch TMDB details for: {$movie->title}");
-
-            return [
-                'tmdb_rating' => $movie->tmdb_rating,
-                'tmdb_vote_count' => $movie->tmdb_vote_count,
-                'updated' => false,
-            ];
-        }
-
-        $rating = isset($details['vote_average'])
-            ? round((float) $details['vote_average'], 1)
-            : null;
-
-        $voteCount = isset($details['vote_count'])
-            ? (int) $details['vote_count']
-            : 0;
-
-        $movie->update([
-            'tmdb_rating' => $rating,
-            'tmdb_vote_count' => $voteCount,
-        ]);
-
-        $logger("Updated {$movie->title}: {$rating}/10 from {$voteCount} votes.");
-
-        return [
-            'tmdb_rating' => $rating,
-            'tmdb_vote_count' => $voteCount,
-            'updated' => true,
-        ];
-    }
-    public function importByTitle(string $title): ?Movie
-    {
-        $token = config('services.tmdb.token');
-
-        if (! $token) {
-            throw new \RuntimeException('Missing TMDB_TOKEN in .env');
-        }
-
-        $searchResult = $this->searchMovie($token, $title);
-
-        if (! $searchResult) {
-            return null;
-        }
+        if (! $searchResult) return null;
 
         $tmdbId = $searchResult['id'];
+        $details = $this->fetchMovieDetails($tmdbId);
 
-        $details = $this->fetchMovieDetails($token, $tmdbId);
+        if (! $details) return null;
 
-        if (! $details) {
-            return null;
-        }
-
-        $credits = $this->fetchCredits($token, $tmdbId);
-        $trailerUrl = $this->fetchYoutubeTrailerUrl($token, $tmdbId);
-        $certification = $this->fetchCertification($token, $tmdbId);
+        [$credits, $trailerUrl, $certification] = [
+            $this->fetchCredits($tmdbId),
+            $this->fetchYoutubeTrailerUrl($tmdbId),
+            $this->fetchCertification($tmdbId),
+        ];
 
         return Movie::updateOrCreate(
+            ['tmdb_id' => $details['id']],
             [
-                'tmdb_id' => $details['id'],
-            ],
-            [
-                'title' => $details['title'] ?? $title,
-                'description' => $details['overview'] ?? null,
-                'poster_url' => $this->posterUrl($details['poster_path'] ?? null),
-                'trailer_url' => $trailerUrl,
-                'release_date' => ! empty($details['release_date']) ? $details['release_date'] : null,
-                'duration' => $details['runtime'] ?? null,
-                'genre' => $this->mapGenre($details['genres'][0]['name'] ?? null),
-                'rating' => $this->mapRating($certification),
-                'featured' => false,
-                'director' => $this->getDirectorName($credits),
-                'actors' => $this->getActors($credits, 10),
-                'tmdb_rating' => isset($details['vote_average'])
-                    ? round((float) $details['vote_average'], 1)
-                    : null,
-
-                'tmdb_vote_count' => isset($details['vote_count'])
-                    ? (int) $details['vote_count']
-                    : 0,
+                'title'           => $details['title'] ?? $title,
+                'description'     => $details['overview'] ?? null,
+                'poster_url'      => $this->posterUrl($details['poster_path'] ?? null),
+                'trailer_url'     => $trailerUrl,
+                'release_date'    => $details['release_date'] ?: null,
+                'duration'        => $details['runtime'] ?? null,
+                'genre'           => $this->mapGenre($details['genres'][0]['name'] ?? null),
+                'rating'          => $this->mapRating($certification),
+                'featured'        => false,
+                'director'        => $this->getDirectorName($credits),
+                'actors'          => $this->getActors($credits, 10),
+                'tmdb_rating'     => isset($details['vote_average'])
+                                        ? round((float) $details['vote_average'], 1)
+                                        : null,
+                'tmdb_vote_count' => (int) ($details['vote_count'] ?? 0),
             ]
         );
     }
 
-    private function searchMovie(string $token, string $title): ?array
+    public function updateMovieVotes(Movie $movie, ?callable $logger = null): array
     {
-        $response = Http::withToken($token)
-            ->acceptJson()
-            ->get('https://api.themoviedb.org/3/search/movie', [
-                'query' => $title,
-                'language' => 'en-US',
-                'include_adult' => false,
-                'page' => 1,
-            ]);
+        $this->withLogger($logger);
 
-        return $response->successful()
-            ? $response->json('results.0')
-            : null;
-    }
-
-    private function fetchMovieDetails(string $token, int $tmdbId): ?array
-    {
-        $response = Http::withToken($token)
-            ->acceptJson()
-            ->get("https://api.themoviedb.org/3/movie/{$tmdbId}", [
-                'language' => 'en-US',
-            ]);
-
-        return $response->successful() ? $response->json() : null;
-    }
-
-    private function fetchCredits(string $token, int $tmdbId): ?array
-    {
-        $response = Http::withToken($token)
-            ->acceptJson()
-            ->get("https://api.themoviedb.org/3/movie/{$tmdbId}/credits", [
-                'language' => 'en-US',
-            ]);
-
-        return $response->successful() ? $response->json() : null;
-    }
-
-    private function fetchYoutubeTrailerUrl(string $token, int $tmdbId): ?string
-    {
-        $response = Http::withToken($token)
-            ->acceptJson()
-            ->get("https://api.themoviedb.org/3/movie/{$tmdbId}/videos", [
-                'language' => 'en-US',
-            ]);
-
-        if ($response->failed()) {
-            return null;
+        if (!$movie->tmdb_id) 
+        {
+            $this->log("Movie {$movie->title} does not have a TMDB ID.");
+            return $this->voteResult($movie->tmdb_rating, $movie->tmdb_vote_count, false);
         }
+
+        $this->log("Fetching latest TMDB votes for: {$movie->title}");
+
+        $details = $this->fetchMovieDetails($movie->tmdb_id);
+
+        if (! $details)
+        {
+            $this->log("Could not fetch TMDB details for: {$movie->title}");
+            return $this->voteResult($movie->tmdb_rating, $movie->tmdb_vote_count, false);
+        }
+
+        $rating    = isset($details['vote_average']) ? round((float) $details['vote_average'], 1) : null;
+        $voteCount = (int) ($details['vote_count'] ?? 0);
+
+        $movie->update([
+            'tmdb_rating'     => $rating,
+            'tmdb_vote_count' => $voteCount,
+        ]);
+
+        $this->log("Updated {$movie->title}: {$rating}/10 from {$voteCount} votes.");
+
+        return $this->voteResult($rating, $voteCount, true);
+    }
+
+    private function searchMovie(string $title): ?array
+    {
+        $response = $this->http->get('/search/movie', [
+            'query'         => $title,
+            'language'      => 'en-US',
+            'include_adult' => false,
+            'page'          => 1,
+        ]);
+
+        return $response->successful() ? $response->json('results.0') : null;
+    }
+
+    private function fetchMovieDetails(int $tmdbId): ?array
+    {
+        $response = $this->http->get("/movie/{$tmdbId}", [
+            'language' => 'en-US',
+        ]);
+
+        return $response->successful() ? $response->json() : null;
+    }
+
+    private function fetchCredits(int $tmdbId): ?array
+    {
+        $response = $this->http->get("/movie/{$tmdbId}/credits", [
+            'language' => 'en-US',
+        ]);
+
+        return $response->successful() ? $response->json() : null;
+    }
+
+    private function fetchYoutubeTrailerUrl(int $tmdbId): ?string
+    {
+        $response = $this->http->get("/movie/{$tmdbId}/videos", [
+            'language' => 'en-US',
+        ]);
+
+        if ($response->failed()) return null;
 
         $videos = collect($response->json('results', []))
             ->where('site', 'YouTube');
 
-        $video = $videos
-            ->where('type', 'Trailer')
-            ->where('official', true)
-            ->first()
+        $video = $videos->where('type', 'Trailer')->where('official', true)->first()
             ?? $videos->where('type', 'Trailer')->first()
             ?? $videos->first();
 
-        return ! empty($video['key'])
-            ? 'https://www.youtube.com/watch?v=' . $video['key']
-            : null;
+        return ! empty($video['key']) ? self::YOUTUBE_URL . $video['key'] : null;
     }
 
-    private function fetchCertification(string $token, int $tmdbId, string $country = 'US'): ?string
+    private function fetchCertification(int $tmdbId, string $country = 'US'): ?string
     {
-        $response = Http::withToken($token)
-            ->acceptJson()
-            ->get("https://api.themoviedb.org/3/movie/{$tmdbId}/release_dates");
+        $response = $this->http->get("/movie/{$tmdbId}/release_dates");
 
-        if ($response->failed()) {
-            return null;
-        }
+        if ($response->failed()) return null;
 
         $countryRelease = collect($response->json('results', []))
             ->firstWhere('iso_3166_1', $country);
 
-        if (! $countryRelease || empty($countryRelease['release_dates'])) {
-            return null;
-        }
+        if (! $countryRelease || empty($countryRelease['release_dates']))  return null;
 
         $releaseDate = collect($countryRelease['release_dates'])
-            ->first(fn ($release) => ! empty($release['certification']));
+            ->first(fn ($r) => ! empty($r['certification']));
 
         return $releaseDate['certification'] ?? null;
     }
 
+    // ── Helpers ───────────────────────────────────────────────────
+
     private function getDirectorName(?array $credits): ?string
     {
-        if (! $credits || empty($credits['crew'])) {
-            return null;
-        }
+        if (! $credits || empty($credits['crew'])) return null;
+        
 
         return collect($credits['crew'])
             ->where('job', 'Director')
@@ -264,21 +251,16 @@ class TmdbMovieImporter
 
     private function posterUrl(?string $path): ?string
     {
-        if (!$path) return null;
+        if (! $path) return null;
 
-        $tmdbUrl = 'https://image.tmdb.org/t/p/w500' . $path;
-        return $this->downloadPoster($tmdbUrl, $path);
-    }
+        $filename = 'posters/' . ltrim($path, '/');
 
-
-    private function downloadPoster(string $url, string $tmdbPath): ?string
-    {
-        $filename = 'posters/' . ltrim($tmdbPath, '/');
-
-        if (!Storage::disk('public')->exists($filename)) 
+        if (! Storage::disk('public')->exists($filename)) 
         {
-            $response = Http::timeout(15)->get($url);
-            if ($response->failed()) return null;
+            $response = Http::timeout(15)->get(self::IMAGE_URL . $path);
+
+            if ($response->failed())
+                return null;
 
             Storage::disk('public')->put($filename, $response->body());
         }
@@ -286,30 +268,42 @@ class TmdbMovieImporter
         return $filename;
     }
 
+    private function voteResult(?float $rating, int $voteCount, bool $updated): array
+    {
+        return 
+        [
+            'tmdb_rating'     => $rating,
+            'tmdb_vote_count' => $voteCount,
+            'updated'         => $updated,
+        ];
+    }
+
     private function mapGenre(?string $genre): MovieGenre
     {
-        return match ($genre) {
-            'Action' => MovieGenre::Action,
-            'Animation' => MovieGenre::Animation,
-            'Comedy' => MovieGenre::Comedy,
-            'Drama' => MovieGenre::Drama,
-            'Horror' => MovieGenre::Horror,
-            'Romance' => MovieGenre::Romance,
-            'Science Fiction' => MovieGenre::Sci_Fi,
-            'Thriller' => MovieGenre::Thriller,
-            'Documentary' => MovieGenre::Documentary,
-            'Fantasy' => MovieGenre::Fantasy,
-            default => MovieGenre::Drama,
+        return match ($genre) 
+        {
+            'Action'           => MovieGenre::Action,
+            'Animation'        => MovieGenre::Animation,
+            'Comedy'           => MovieGenre::Comedy,
+            'Drama'            => MovieGenre::Drama,
+            'Horror'           => MovieGenre::Horror,
+            'Romance'          => MovieGenre::Romance,
+            'Science Fiction'  => MovieGenre::Sci_Fi,
+            'Thriller'         => MovieGenre::Thriller,
+            'Documentary'      => MovieGenre::Documentary,
+            'Fantasy'          => MovieGenre::Fantasy,
+            default            => MovieGenre::Drama,
         };
     }
 
     private function mapRating(?string $rating): MovieRating
     {
-        return match ($rating) {
-            'G' => MovieRating::G,
-            'PG' => MovieRating::PG,
+        return match ($rating) 
+        {
+            'G'     => MovieRating::G,
+            'PG'    => MovieRating::PG,
             'PG-13' => MovieRating::PG_13,
-            'R' => MovieRating::R,
+            'R'     => MovieRating::R,
             'NC-17' => MovieRating::NC_17,
             default => MovieRating::PG_13,
         };
