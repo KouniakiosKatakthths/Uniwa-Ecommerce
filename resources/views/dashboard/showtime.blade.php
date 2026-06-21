@@ -2,15 +2,18 @@
 @section("content")
 
 <div class="max-w-4xl mx-auto px-4 py-8">
+  <x-flash-messages class="mb-6"></x-flash-messages>
 
   {{-- Header --}}
   <div class="flex items-center justify-between mb-6">
     <div class="flex gap-3">
       <x-button href="{{ route('showtimes.edit', $showtime) }}" variant="ghost">Edit</x-button>
-      <form action="{{ route('showtimes.destroy', $showtime) }}" method="POST" onsubmit="return confirm('Delete this showtime?')">
-        @csrf @method('DELETE')
-        <x-button variant="danger" type="submit">Delete</x-button>
-      </form>
+      @if (auth()->user()->isAdmin())
+        <form action="{{ route('showtimes.destroy', $showtime) }}" method="POST" onsubmit="return confirm('Delete this showtime?')">
+          @csrf @method('DELETE')
+          <x-button variant="danger" type="submit">Delete</x-button>
+        </form>
+      @endif
     </div>
   </div>
 
@@ -82,7 +85,7 @@
         <div>
           <dt class="text-gray-400">Revenue</dt>
           <dd class="text-white font-bold text-2xl mt-1">
-            €{{ number_format(($showtime->tickets()->count()) * $showtime->ticket_price, 2) }}
+            €{{ number_format($showtime->tickets->where('status', '!=', \App\Enums\TicketStatus::Cancelled)->count() * $showtime->ticket_price, 2) }}
           </dd>
         </div>
       </dl>
@@ -95,38 +98,35 @@
       @if($showtime->tickets->isEmpty())
           <p class="text-gray-500 text-sm">No tickets sold yet.</p>
       @else
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-gray-400 border-b border-gray-700">
-              <th class="text-left pb-3 font-medium">Seat</th>
-              <th class="text-left pb-3 font-medium">Customer</th>
-              <th class="text-left pb-3 font-medium">Booked At</th>
-              <th class="text-right pb-3 font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-700">
-            @foreach($showtime->tickets as $ticket)
-              <tr class="text-gray-300">
-                <td class="py-3 font-semibold text-white">#{{ $ticket->seat }}</td>
-                <td class="py-3">{{ $ticket->user->name ?? '—' }}</td>
-                <td class="py-3 text-gray-400">{{ $ticket->created_at->format('d M Y, H:i') }}</td>
-                <td class="py-3 text-right">
-                  @if ($ticket->status === \App\Enums\TicketStatus::Cancelled)
-                    <p class="text-red-500">Ticket Cancelled</p>
-                  @elseif ($ticket->status === \App\Enums\TicketStatus::Confirmed)
-                    <p class="text-green-500">Ticket Confirmed</p>
-                  @elseif ($ticket->status === \App\Enums\TicketStatus::Pending)
-                    <form action="{{ route('tickets.destroy', $ticket) }}" method="POST"
-                      onsubmit="return confirm('Cancel ticket for seat #{{ $ticket->seat }}?')">
-                      @csrf @method('DELETE')
-                      <x-button variant="danger" type="submit">Cancel</x-button>
-                    </form>
-                  @endif
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
+        <x-data-grid>
+          <x-slot:head>
+            <x-data-grid.header hidden="md">Seat</x-data-grid.header>
+            <x-data-grid.header hidden="md">Customer</x-data-grid.header>
+            <x-data-grid.header hidden="lg">Booked At</x-data-grid.header>
+            <x-data-grid.header hidden="lg" class="text-right">Action</x-data-grid.header>
+          </x-slot:head>
+
+          @foreach ($showtime->tickets as $ticket)
+            <x-data-grid-row>
+              <x-data-grid.data class="py-3 font-semibold text-white">#{{ $ticket->seat }}</x-data-grid.data>
+              <x-data-grid.data class="py-3">{{ $ticket->user->name ?? '—' }}</x-data-grid.data>
+              <x-data-grid.data class="py-3 text-gray-400">{{ $ticket->created_at->format('d M Y, H:i') }}</x-data-grid.data>
+              <x-data-grid.data class="py-3 text-right">
+                @if ($ticket->status === \App\Enums\TicketStatus::Cancelled)
+                  <p class="text-red-500">Ticket Cancelled</p>
+                @elseif ($ticket->status === \App\Enums\TicketStatus::Confirmed)
+                  <p class="text-green-500">Ticket Confirmed</p>
+                @elseif ($ticket->status === \App\Enums\TicketStatus::Pending)
+                  <form action="{{ route('tickets.destroy', $ticket) }}" method="POST"
+                    onsubmit="return confirm('Cancel ticket for seat #{{ $ticket->seat }}?')">
+                    @csrf @method('DELETE')
+                    <x-button variant="danger" type="submit">Cancel</x-button>
+                  </form>
+                @endif
+              </x-data-grid.data>
+            </x-data-grid-row>
+          @endforeach
+        </x-data-grid>
       @endif
     </div>
   </div>

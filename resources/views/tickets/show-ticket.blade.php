@@ -17,6 +17,8 @@
 
 @section("content")
 <div class="max-w-lg mx-auto px-4 py-10">
+  <x-flash-messages class="mb-6"></x-flash-messages>
+
   <div class="rounded-2xl overflow-hidden border border-white/10 bg-gray-800/60">
     {{-- Top section --}}
     <div class="flex gap-5 p-6 border-b border-white/10">

@@ -23,9 +23,6 @@ return new class extends Migration
             $table->string('barcode');
             $table->timestamps();
 
-            //Enforce one ticket per show
-            $table->unique(['showtime_id', 'seat']);
-
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('showtime_id')->references('id')->on('showtimes')->cascadeOnDelete();
         });

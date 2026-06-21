@@ -13,6 +13,8 @@
     @method('PUT')
   @endif
 
+  <x-flash-messages></x-flash-messages>
+
   {{-- Movie field --}}
   <div class="flex flex-col gap-1" x-data='movieSearch(@json(old('movie_id')), @json($show?->movie?->only('id', 'title')))'>
     {{-- Hidden input for submit --}}

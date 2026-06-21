@@ -105,7 +105,7 @@ class TicketController extends Controller
 
     public function destroy(Ticket $ticket)
     {
-        abort_unless($ticket->user_id === auth()->id() || auth()->user()->is_admin, 403);
+        abort_unless(auth()->user()->isClerk(), 403);
 
         if ($ticket->status === TicketStatus::Confirmed) {
             return back()->with('error', 'Cannot cancel an already used ticket.');
