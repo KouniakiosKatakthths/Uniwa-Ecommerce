@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Trust Nginx Proxy Manager forwarded IPs
+    RemoteIPHeader X-Forwarded-For
+    RemoteIPTrustedProxy 172.16.0.0/12
+
+    ErrorLog ${APACHE_LOG_DIR}/cinema_error.log
+    CustomLog ${APACHE_LOG_DIR}/cinema_access.log combined
+</VirtualHost>
