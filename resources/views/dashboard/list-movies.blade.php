@@ -2,6 +2,8 @@
 
 @section("content")
 <div class="sm:px-6 max-w-7xl mx-auto lg:px-8 py-5">
+  <x-flash-messages class="mb-6"></x-flash-messages>  
+
   {{-- Header --}}
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-gray-200 text-3xl font-bold">Movies</h1>

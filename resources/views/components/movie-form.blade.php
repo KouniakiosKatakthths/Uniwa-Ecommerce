@@ -13,6 +13,8 @@
     @method('PUT')
   @endif
 
+  <x-flash-messages></x-flash-messages>
+
   {{-- TMDB ID + Lookup --}}
   <div class="flex flex-col gap-1" x-data="tmdbLookup('{{ old('tmdb_id', $movie?->tmdb_id) }}', '{{ route('movies.tmdb-lookup') }}')">
     <x-input-label>TMDB ID</x-input-label>

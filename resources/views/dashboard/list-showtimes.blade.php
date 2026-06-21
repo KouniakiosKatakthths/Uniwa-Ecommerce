@@ -1,6 +1,8 @@
 @extends('layouts.cinema')
 @section('content')
 <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+  <x-flash-messages class="mb-6"></x-flash-messages>
+
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-gray-200 text-3xl font-bold">Showtimes</h1>
     <x-button :href="route('showtimes.create')">Add showtime</x-button>
