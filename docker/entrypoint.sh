@@ -8,9 +8,6 @@ until php -r "new PDO('mysql:host=${DB_HOST};port=${DB_PORT:-3306};dbname=${DB_D
 done
 echo "MySQL ready!"
 
-echo "Generating app key if not exist..."
-php artisan key:generate --no-interaction --force
-
 echo "Running migrations..."
 php artisan migrate --force --no-interaction
 
@@ -24,4 +21,6 @@ php artisan view:cache
 php artisan event:cache
 
 echo "Cinema app ready! Starting Apache..."
+echo "~ 67 on a merry rizzmass 67 on a merry rizzmass ~"
+echo "¯\_(ツ)_/¯"
 exec "$@"
