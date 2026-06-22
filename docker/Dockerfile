@@ -13,8 +13,6 @@ RUN groupadd -g 1001 developer
 # create a new user called developer and add it to this group
 RUN useradd -u 1001 -g developer developer
 
-USER www-data
-
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
@@ -29,11 +27,8 @@ COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
-ENTRYPOINT ["/entrypoint.sh"]
 
-# RUN chown -R www-data:www-data /var/www/html \
-#     && chmod -R 775 /var/www/html/storage \
-#     && chmod -R 775 /var/www/html/bootstrap/cache \
-#     && chmod -R 755 /var/www/html/public
+USER www-data
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["apache2-foreground"]
