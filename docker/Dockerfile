@@ -7,7 +7,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 RUN a2enmod rewrite headers remoteip
-USER www-data;
+
+# create a new linux user group called 'developer' with an arbitrary group id of '1001'
+RUN groupadd -g 1001 developer
+# create a new user called developer and add it to this group
+RUN useradd -u 1001 -g developer developer
+
+USER www-data
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
