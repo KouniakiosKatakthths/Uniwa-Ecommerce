@@ -23,7 +23,4 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
 ENTRYPOINT ["/entrypoint.sh"]
-
-RUN chown -R www-data:www-data storage
-
 CMD ["apache2-foreground"]

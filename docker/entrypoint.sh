@@ -39,6 +39,9 @@ fi
 echo "Creating storage symlink..."
 php artisan storage:link --force 2>/dev/null || true
 
+chown -R www-data:www-data /var/www/html/storage
+chown -R www-data:www-data /var/www/html/bootstrap/cache
+
 echo "Running Laravel optimizations..."
 php artisan config:cache
 php artisan route:cache
