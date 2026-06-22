@@ -7,12 +7,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 RUN a2enmod rewrite headers remoteip
+USER www-data;
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY --chown=www-data:www-data . .
+COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
@@ -24,9 +25,9 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 80
 ENTRYPOINT ["/entrypoint.sh"]
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache \
-    && chmod -R 755 /var/www/html/public
+# RUN chown -R www-data:www-data /var/www/html \
+#     && chmod -R 775 /var/www/html/storage \
+#     && chmod -R 775 /var/www/html/bootstrap/cache \
+#     && chmod -R 755 /var/www/html/public
 
 CMD ["apache2-foreground"]
