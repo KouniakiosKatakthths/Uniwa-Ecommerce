@@ -42,11 +42,12 @@ class CreateAdmin extends Command
             return;
         }
 
-        $user = User::factory()->state([
-            'name' => $name,
-            'email' => $email,
+        $user = User::forceCreate([
+            'name'     => $name,
+            'email'    => $email,
             'password' => Hash::make($password),
-        ])->as_admin()->create();
+            'role'     => \App\Enums\UserRole::Admin,
+        ]);
 
         $this->info("Admin user created: {$user->email}");
     }

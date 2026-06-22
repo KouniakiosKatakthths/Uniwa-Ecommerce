@@ -15,6 +15,9 @@ if [ "${DEMO_MODE}" = "true" ]; then
     echo "@ INTENTIONAL. (DEMO_MODE=false in .env)  @"
     echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
+    echo "Installing dev dependencies for seeders..."
+    composer install --no-interaction --optimize-autoloader
+
     echo "Running fresh migrations..."
     php artisan migrate:fresh --force --no-interaction
 
