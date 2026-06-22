@@ -21,7 +21,7 @@ if [ "${DEMO_MODE}" = "true" ]; then
     php artisan config:clear
     php artisan migrate:fresh --force --no-interaction
     
-    sleep 2
+    sleep 3
 
     echo "Setting up admin user..."
     php artisan admin:create
@@ -39,9 +39,6 @@ fi
 echo "Creating storage symlink..."
 php artisan storage:link --force 2>/dev/null || true
 
-chown -R www-data:www-data /var/www/html/storage
-chown -R www-data:www-data /var/www/html/bootstrap/cache
-
 echo "Running Laravel optimizations..."
 php artisan config:cache
 php artisan route:cache
@@ -51,5 +48,8 @@ php artisan event:cache
 echo "Cinema app ready! Starting Apache..."
 echo "~ 67 on a merry rizzmass 67 on a merry rizzmass ~"
 echo "¯\_(ツ)_/¯"
+
+chown -R www-data:www-data /var/www/html/storage
+chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 exec "$@"
