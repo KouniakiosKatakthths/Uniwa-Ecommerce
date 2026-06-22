@@ -16,6 +16,19 @@ This project was developed for the course of E-Commerse in University of West At
 - **Admin Panel**: Manage movies, screenings, halls, and reservations from a dedicated back-office interface.
 - [**TMDB library**](https://www.themoviedb.org/): For easier managment of movie data an interface with the TMDB api has been build. The user can choose to load data for a movie based on the TMDB ID. Any movie with an assosiated TMDB ID will also get automatic critics updates from the TMDB system.
 
+## Demo
+
+For the demo website you can use the following credentials
+- **Admin** \
+email: admin@admin.com \
+password: password3
+- **Clerk** \
+email: clerk@clerk.com \
+password: password2
+- **User** \
+email: user@user.com \
+password: password1 
+
 ## Getting started
 __*The following instructions is for local development, for docker deployment look the [docker README](docker/README.md) file.*__
 
