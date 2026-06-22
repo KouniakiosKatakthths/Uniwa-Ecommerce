@@ -18,8 +18,10 @@ if [ "${DEMO_MODE}" = "true" ]; then
     echo "Installing dev dependencies for seeders..."
     composer install --no-interaction --optimize-autoloader
 
-    echo "Running fresh migrations..."
+    php artisan config:clear
     php artisan migrate:fresh --force --no-interaction
+    
+    sleep 2
 
     echo "Setting up admin user..."
     php artisan admin:create
