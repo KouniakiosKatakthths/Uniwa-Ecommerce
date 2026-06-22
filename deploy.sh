@@ -78,6 +78,9 @@ sudo sed -i "s/APP_ENV=.*/APP_ENV=production/" "$DEPLOY_PATH/.env"
 sudo sed -i "s/APP_DEBUG=.*/APP_DEBUG=false/" "$DEPLOY_PATH/.env"
 sudo sed -i "s|APP_URL=.*|APP_URL=http://${SERVER_NAME}|" "$DEPLOY_PATH/.env"
 
+warning "Using same URL for ASSET_URL: http://${SERVER_NAME}"
+sudo sed -i "s|ASSET_URL=.*|ASSET_URL=http://${SERVER_NAME}|" "$DEPLOY_PATH/.env"
+
 # ── 10. Laravel production optimizations ──
 info "Running Laravel production optimizations..."
 sudo php "$DEPLOY_PATH/artisan" config:cache
