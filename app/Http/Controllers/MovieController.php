@@ -66,9 +66,23 @@ class MovieController extends Controller
             $data['poster_url'] = $request->file('poster')->store('posters', 'public');
         
         unset($data['poster']); //Remove file field, we use poster_url instead
-        $movie = Movie::create($data);
 
-        return $this->redirectWithTmdbUpdate($tmdb, $movie, 'Movie created successfully.');
+        try
+        {
+            $movie = Movie::create($data);
+            return $this->redirectWithTmdbUpdate($tmdb, $movie, 'Movie created successfully.');
+        }
+        catch (\Illuminate\Database\QueryException $e)
+        {
+            //MySQL duplicate entry error code
+            if ($e->errorInfo[1] === 1062) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['tmdb_id' => 'A movie with this TMDB ID already exists.']);
+            }
+
+            throw $e;
+        }
     }
 
     public function show(Movie $movie)
