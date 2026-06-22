@@ -18,17 +18,17 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 RUN npm ci && npm run build && rm -rf node_modules
 
-# Ensure full storage structure exists in the image
-RUN mkdir -p /var/www/html/storage/app/public \
-             /var/www/html/storage/framework/cache \
-             /var/www/html/storage/framework/sessions \
-             /var/www/html/storage/framework/views \
-             /var/www/html/storage/logs
+# # Ensure full storage structure exists in the image
+# RUN mkdir -p /var/www/html/storage/app/public \
+#              /var/www/html/storage/framework/cache \
+#              /var/www/html/storage/framework/sessions \
+#              /var/www/html/storage/framework/views \
+#              /var/www/html/storage/logs
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache \
-    && chmod -R 755 /var/www/html/public
+# RUN chown -R www-data:www-data /var/www/html \
+#     && chmod -R 775 /var/www/html/storage \
+#     && chmod -R 775 /var/www/html/bootstrap/cache \
+#     && chmod -R 755 /var/www/html/public
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
