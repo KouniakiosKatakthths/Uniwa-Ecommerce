@@ -35,12 +35,15 @@ class ResetDemoDatabase extends Command
         $this->warn('Resetting demo database...');
 
         Artisan::call('migrate:fresh', [
-            '--seed' => true,
             '--force' => true,
         ]);
 
         $this->line(Artisan::output());
         Artisan::call('admin:create');
+
+        Artisan::call('db:seed', [
+            '--force' => true,
+        ]);
 
         $this->line(Artisan::output());
         $this->info('Demo database reset, reseeded, and admin user created.');

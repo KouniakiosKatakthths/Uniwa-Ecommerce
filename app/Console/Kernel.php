@@ -18,6 +18,13 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()              // skip if previous run is still going
             ->runInBackground()                 // don't block other scheduled tasks
             ->appendOutputTo(storage_path('logs/tmdb-ratings.log'));  // log output
+
+        //Register demo command
+        $schedule->command('demo:reset')
+            ->daily()
+            ->when(fn () => config('app.demo_mode'))
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/demo-reset.log'));
     }
 
     /**

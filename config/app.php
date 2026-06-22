@@ -82,6 +82,20 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Admin Credentials
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the credentials of a default admin user for the 
+    | first run of the application. It is recommented that you use your 
+    | own credentials.
+    |
+    */
+    'admin_email' => env('ADMIN_EMAIL', 'admin@admin.com'),
+    'admin_name' => env('ADMIN_NAME', 'admin'),
+    'admin_password' => env('ADMIN_PASSWORD', 'password'),
+
     'timezone' => 'UTC',
 
     /*

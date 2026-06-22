@@ -27,15 +27,15 @@ class CreateAdmin extends Command
      */
     public function handle()
     {
-        $email = env('ADMIN_EMAIL');
-        $name  = env('ADMIN_NAME');
-        $password = env('ADMIN_PASSWORD');
+        $email = config('app.admin_email');
+        $name  = config('app.admin_name');
+        $password = config('app.admin_password');
 
         if (!$name || !$email || !$password) 
             $this->warn('No ADMIN_NAME or ADMIN_EMAIL or ADMIN_PASSWORD set, Using defaults.');
 
         //Check if user exist
-        $user = User::where('email', $email ?? 'admin@admin.com')->first();
+        $user = User::where('email', $email)->first();
         if ($user)
         {
             $this->info("Admin user already exists: {$user->email}");
@@ -43,9 +43,9 @@ class CreateAdmin extends Command
         }
 
         $user = User::factory()->state([
-            'name' => $name ?? 'admin',
-            'email' => $email ?? 'admin@admin.com',
-            'password' => Hash::make($password ?? 'password'),
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make($password),
         ])->as_admin()->create();
 
         $this->info("Admin user created: {$user->email}");
