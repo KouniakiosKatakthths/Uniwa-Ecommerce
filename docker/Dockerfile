@@ -22,8 +22,8 @@ COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
-
-USER www-data
 ENTRYPOINT ["/entrypoint.sh"]
+
+RUN chown -R www-data:www-data storage
 
 CMD ["apache2-foreground"]
