@@ -46,6 +46,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Demo Mode
+    |--------------------------------------------------------------------------
+    |
+    | When your application is in demo mode, all data from the database will
+    | be errased every 24h and they will be re-seeded by the default application
+    | seeders. In demo mode admins are not able to change their passwords.
+    |
+    */
+    'demo_mode' => (bool) env('DEMO_MODE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
