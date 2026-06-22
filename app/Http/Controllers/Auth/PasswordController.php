@@ -20,10 +20,13 @@ class PasswordController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
+        if ($request->user()->isAdmin() && config('app.demo_mode') === true)
+            return back()->with('error', 'You cannot change admin passwords in demo mode');
+
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        return back()->with('success', 'Password updated sucessfuly');
     }
 }

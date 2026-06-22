@@ -29,6 +29,8 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        
+
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],
@@ -41,6 +43,9 @@ class NewPasswordController extends Controller
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) use ($request) {
+                if ($user->isAdmin() && config('app.demo_mode'))
+                    return;
+
                 $user->forceFill([
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),

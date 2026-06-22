@@ -2,6 +2,8 @@
 
 @section("content")
 <div class="flex flex-col max-w-7xl mx-auto sm:px-6 lg:px-8 py-10">
+  <x-flash-messages class="mb-6"></x-flash-messages>
+
   <h2 class="font-semibold text-3xl text-gray-800 leading-tight dark:text-gray-300 ml-5">
     {{ __('Profile') }}
   </h2>
