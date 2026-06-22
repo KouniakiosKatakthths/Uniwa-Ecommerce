@@ -7,7 +7,6 @@ services:
     volumes:
       - ./config/apache.conf:/etc/apache2/sites-available/000-default.conf:ro
       - cinelux_storage:/var/www/html/storage
-      - cinelux_cache:/var/www/html/bootstrap/cache
     depends_on:
       db:
         condition: service_healthy
@@ -21,7 +20,6 @@ services:
     env_file: .env
     volumes:
       - cinelux_storage:/var/www/html/storage
-      - cinelux_cache:/var/www/html/bootstrap/cache
     depends_on:
       db:
         condition: service_healthy
@@ -53,7 +51,6 @@ services:
 volumes:
   cinelux_db:
   cinelux_storage:
-  cinelux_cache:
 
 networks:
   cinelux_network:
