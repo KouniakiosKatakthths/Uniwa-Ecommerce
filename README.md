@@ -21,6 +21,7 @@ __*The following instructions is for local development, for docker deployment lo
 
 *The instructions below is an overview of the required steps. For convenience the [`setup.sh`](setup.sh) script has been created for linux or WSL systems. Execute like so: `./setup.sh`. If needed add execution rights: `chmod +x ./setup.sh`*
 
+Before you start it is recommented that you take a look at the [`.env.examble`](.env.examble) file since it contains info about the configuration of the application. 
 Make sure you have installed [Git](https://git-scm.com/) on your machine. For windowds users the use of [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is recommended.
 
 ### Installation
