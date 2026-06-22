@@ -1,0 +1,59 @@
+services:
+  app:
+    image: ghcr.io/kouniakioskatakthths/uniwa-ecommerce:latest
+    container_name: cinelux
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config/apache.conf:/etc/apache2/sites-available/000-default.conf:ro
+      - cinelux_storage:/var/www/html/storage
+      - cinelux_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cinelux_network
+
+  scheduler:
+    image: ghcr.io/kouniakioskatakthths/uniwa-ecommerce:latest
+    container_name: cinema_scheduler
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - cinelux_storage:/var/www/html/storage
+      - cinelux_cache:/var/www/html/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cinelux_network
+    entrypoint: []
+    command: >
+      sh -c "while true; do php /var/www/html/artisan schedule:run --no-interaction; sleep 60; done"
+
+  db:
+    image: mariadb:10.6
+    container_name: cinema_db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - cinelux_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cinelux_network
+
+volumes:
+  cinelux_db:
+  cinelux_storage:
+  cinelux_cache:
+
+networks:
+  cinelux_network:
