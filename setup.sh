@@ -25,8 +25,8 @@ sudo apt update -qq
  
 info "Installing PHP and required extensions..."
 sudo apt install -y php php-cli php-mbstring php-xml php-curl \
-    php-zip php-bcmath php-tokenizer php8.2-pdo php-mysql php-sqlite3
- 
+    php-zip php-bcmath php-tokenizer php-pdo php-mysql php-sqlite3
+    
 info "PHP version: $(php -v | head -n 1)"
 
 # ========= INSTALL MYSQL ============
