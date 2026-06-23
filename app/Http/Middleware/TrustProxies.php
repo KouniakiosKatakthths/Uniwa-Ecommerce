@@ -14,6 +14,7 @@ class TrustProxies extends Middleware
      */
     protected $proxies;
 
+
     /**
      * The headers that should be used to detect proxies.
      *
@@ -25,4 +26,9 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_PORT |
         Request::HEADER_X_FORWARDED_PROTO |
         Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    public function __construct()
+    {
+        $this->proxies = config('app.trusted_proxies');
+    }
 }
