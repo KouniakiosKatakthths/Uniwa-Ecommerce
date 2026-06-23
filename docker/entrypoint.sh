@@ -48,8 +48,4 @@ php artisan event:cache
 echo "Cinema app ready! Starting Apache..."
 echo "~ 67 on a merry rizzmass 67 on a merry rizzmass ~"
 echo "¯\_(ツ)_/¯"
-
-chown -R www-data:www-data /var/www/html/storage
-chown -R www-data:www-data /var/www/html/bootstrap/cache
-
 exec "$@"
