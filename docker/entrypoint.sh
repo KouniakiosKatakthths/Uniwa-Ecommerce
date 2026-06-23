@@ -21,8 +21,6 @@ if [ "${DEMO_MODE}" = "true" ]; then
     php artisan config:clear
     php artisan migrate:fresh --force --no-interaction
     
-    sleep 3
-
     echo "Setting up admin user..."
     php artisan admin:create
 
@@ -44,6 +42,9 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
+
+chown -R www-data:www-data /var/www/html/storage
+chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 echo "Cinema app ready! Starting Apache..."
 echo "~ 67 on a merry rizzmass 67 on a merry rizzmass ~"
