@@ -100,6 +100,7 @@ return [
 
 
     'trusted_proxies' => env('TRUSTED_PROXIES', '*'),
+    'force_https' => env('FORCE_HTTPS', false),
 
     /*
     |--------------------------------------------------------------------------

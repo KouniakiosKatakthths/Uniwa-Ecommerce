@@ -21,11 +21,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //Enforce HTTPS
-        if (env('FORCE_HTTPS', false))
+        if (config('app.force_https'))
             URL::forceScheme('https');
 
         # Root path on prod
         if (config('app.env') === 'production') 
             URL::forceRootUrl(config('app.url'));
+
+        Paginator::currentPathResolver(function () {
+            return rtrim(config('app.url'), '/') . '/' . ltrim(request()->path(), '/');
+        });
     }
 }
